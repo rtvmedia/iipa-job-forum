@@ -40,7 +40,7 @@ app.get('/api/health', (_, res) => res.json({
 // Serve React build in production
 if (isProd) {
   app.use(express.static(clientDist));
-  app.get('*', (req, res) => {
+  app.get('/{*splat}', (req, res) => {
     res.sendFile(path.join(clientDist, 'index.html'));
   });
 }
