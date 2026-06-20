@@ -10,83 +10,64 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async e => {
-    e.preventDefault();
-    setLoading(true); setError('');
+    e.preventDefault(); setLoading(true); setError('');
     try {
       const user = await login(form.email, form.password);
-      navigate(user.role === 'recruiter' ? '/recruiter/dashboard' : '/seeker/dashboard');
+      navigate(user.role==='recruiter' ? '/recruiter/dashboard' : '/seeker/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2">
-            <span className="text-[#FF9933] font-bold text-2xl">IIPA</span>
-            <span className="text-[#1a237e] font-semibold text-xl">Job Forum</span>
+    <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', padding:'24px 16px', background:'#f3f2ef' }}>
+      <div style={{ width:'100%', maxWidth:'400px' }}>
+        <div style={{ textAlign:'center', marginBottom:'24px' }}>
+          <Link to="/" style={{ display:'inline-flex', alignItems:'center', gap:'6px' }}>
+            <span style={{ color:'#FF9933', fontWeight:700, fontSize:'22px' }}>IIPA</span>
+            <span style={{ color:'#1a237e', fontWeight:600, fontSize:'18px' }}>Job Forum</span>
           </Link>
-          {/* tricolor bar */}
-          <div className="flex justify-center gap-2 mt-3 mb-1">
-            <div className="w-6 h-0.5 rounded-full bg-[#FF9933]" />
-            <div className="w-6 h-0.5 rounded-full bg-gray-300" />
-            <div className="w-6 h-0.5 rounded-full bg-[#138808]" />
+          <div style={{ display:'flex', justifyContent:'center', gap:'8px', margin:'10px 0 4px' }}>
+            <div style={{ width:'20px', height:'2px', background:'#FF9933', borderRadius:'2px' }} />
+            <div style={{ width:'20px', height:'2px', background:'#ccc', borderRadius:'2px' }} />
+            <div style={{ width:'20px', height:'2px', background:'#138808', borderRadius:'2px' }} />
           </div>
-          <h1 style={{ fontFamily:"'Georgia',serif", color:'#1a237e', fontSize:'1.8rem', fontWeight:700 }} className="mt-3">
-            Welcome Back
-          </h1>
-          <p className="text-gray-500 text-sm mt-1" style={{ fontFamily:'system-ui' }}>
-            Sign in to continue to your account
-          </p>
+          <h1 style={{ fontWeight:700, color:'#1a237e', fontSize:'22px', marginTop:'12px' }}>Welcome Back</h1>
+          <p style={{ color:'#666', fontSize:'14px', marginTop:'4px' }}>Sign in to continue to your account</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 mb-5 text-xs text-orange-800" style={{ fontFamily:'system-ui' }}>
+        <div style={{ background:'white', borderRadius:'8px', boxShadow:'0 0 0 1px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.06)', padding:'28px 24px' }}>
+          <div style={{ background:'#fff8f0', border:'1px solid #ffe0b2', borderRadius:'6px', padding:'10px 14px', marginBottom:'20px', fontSize:'13px', color:'#bf360c' }}>
             <strong>Demo accounts:</strong><br />
             Seeker: seeker@iipa.org / password123<br />
             Recruiter: recruiter@iipa.org / password123
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} style={{ display:'flex', flexDirection:'column', gap:'16px' }}>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" style={{ fontFamily:'system-ui' }}>Email</label>
-              <input
-                type="email" required
-                value={form.email}
-                onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#1a237e] transition"
-                style={{ fontFamily:'system-ui' }}
-                placeholder="you@example.com"
-              />
+              <label style={{ display:'block', fontSize:'13px', fontWeight:500, color:'#333', marginBottom:'6px' }}>Email</label>
+              <input type="email" required value={form.email} onChange={e => setForm(f=>({...f,email:e.target.value}))}
+                style={{ width:'100%', border:'1px solid #ddd', borderRadius:'6px', padding:'10px 12px', fontSize:'14px', outline:'none', boxSizing:'border-box' }}
+                onFocus={e=>e.target.style.borderColor='#1a237e'} onBlur={e=>e.target.style.borderColor='#ddd'}
+                placeholder="you@example.com" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" style={{ fontFamily:'system-ui' }}>Password</label>
-              <input
-                type="password" required
-                value={form.password}
-                onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#1a237e] transition"
-                style={{ fontFamily:'system-ui' }}
-                placeholder="••••••••"
-              />
+              <label style={{ display:'block', fontSize:'13px', fontWeight:500, color:'#333', marginBottom:'6px' }}>Password</label>
+              <input type="password" required value={form.password} onChange={e => setForm(f=>({...f,password:e.target.value}))}
+                style={{ width:'100%', border:'1px solid #ddd', borderRadius:'6px', padding:'10px 12px', fontSize:'14px', outline:'none', boxSizing:'border-box' }}
+                onFocus={e=>e.target.style.borderColor='#1a237e'} onBlur={e=>e.target.style.borderColor='#ddd'}
+                placeholder="••••••••" />
             </div>
-
-            {error && <p className="text-red-500 text-sm" style={{ fontFamily:'system-ui' }}>{error}</p>}
-
+            {error && <p style={{ color:'#c62828', fontSize:'13px' }}>{error}</p>}
             <button type="submit" disabled={loading}
-              style={{ background:'#1a237e', fontFamily:'system-ui', fontWeight:600 }}
-              className="w-full py-3 rounded-xl text-white text-sm hover:bg-[#283593] disabled:opacity-50 transition">
+              style={{ background:'#1a237e', color:'white', fontWeight:600, fontSize:'14px', padding:'11px', borderRadius:'6px', border:'none', opacity: loading ? 0.6 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}>
               {loading ? 'Signing in…' : 'Sign In'}
             </button>
           </form>
 
-          <p className="text-center text-sm text-gray-500 mt-5" style={{ fontFamily:'system-ui' }}>
+          <p style={{ textAlign:'center', fontSize:'13px', color:'#666', marginTop:'20px' }}>
             No account yet?{' '}
-            <Link to="/register" className="text-[#FF9933] font-semibold hover:underline">Create one</Link>
+            <Link to="/register" style={{ color:'#FF9933', fontWeight:600 }}>Create one</Link>
           </p>
         </div>
       </div>

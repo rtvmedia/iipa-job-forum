@@ -1,82 +1,71 @@
 import { Link } from 'react-router-dom';
 
+const W = '1128px';
+
 export default function About() {
   return (
     <div>
-      <section style={{ background:'linear-gradient(135deg,#0a2342,#0d3060)' }} className="py-20 px-4 text-white text-center">
-        <h1 style={{ fontFamily:"'Georgia',serif", fontSize:'2.5rem', fontWeight:700, color:'white' }} className="mb-4">
-          About IIPA Job Forum
-        </h1>
-        <p className="text-gray-300 max-w-2xl mx-auto text-lg" style={{ fontFamily:'system-ui' }}>
-          Pakistan's trusted career platform connecting ambitious professionals with forward-thinking employers.
+      <section style={{ background:'#1a237e', padding:'48px 16px', textAlign:'center' }}>
+        <h1 style={{ fontWeight:700, fontSize:'clamp(1.6rem,3vw,2.2rem)', color:'white', marginBottom:'10px' }}>About IIPA Job Forum</h1>
+        <p style={{ color:'rgba(255,255,255,0.75)', maxWidth:'560px', margin:'0 auto', fontSize:'15px', lineHeight:1.6 }}>
+          India's trusted career platform connecting ambitious professionals with forward-thinking employers.
         </p>
       </section>
 
-      <section className="max-w-5xl mx-auto px-4 py-16 grid md:grid-cols-2 gap-12 items-center">
-        <div>
-          <h2 style={{ fontFamily:"'Georgia',serif", color:'#0a2342', fontSize:'1.8rem', fontWeight:700 }} className="mb-4">
-            Our Mission
-          </h2>
-          <p className="text-gray-600 leading-relaxed mb-4" style={{ fontFamily:'system-ui' }}>
-            IIPA Job Forum was founded with a single purpose: to remove the friction from hiring and job searching in Pakistan. We believe every professional deserves access to quality opportunities, and every employer deserves to find the right talent efficiently.
-          </p>
-          <p className="text-gray-600 leading-relaxed" style={{ fontFamily:'system-ui' }}>
-            Our platform provides two distinct, purpose-built workspaces — one for job seekers to discover, apply, and grow, and another for recruiters to post roles, screen candidates, and manage their hiring pipeline.
-          </p>
+      <section style={{ maxWidth:W, margin:'0 auto', padding:'40px 16px' }}>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr', gap:'40px' }} className="about-grid">
+          <div>
+            <h2 style={{ fontWeight:700, fontSize:'20px', color:'#1a237e', marginBottom:'12px' }}>Our Mission</h2>
+            <p style={{ color:'#555', lineHeight:1.7, fontSize:'14px', marginBottom:'12px' }}>
+              IIPA Job Forum was founded with a single purpose: to remove the friction from hiring and job searching in India. We believe every professional deserves access to quality opportunities, and every employer deserves to find the right talent efficiently.
+            </p>
+            <p style={{ color:'#555', lineHeight:1.7, fontSize:'14px' }}>
+              Our platform provides two distinct, purpose-built workspaces — one for job seekers to discover, apply, and grow, and another for recruiters to post roles, screen candidates, and manage their hiring pipeline.
+            </p>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px' }}>
+            {[
+              { icon:'🎯', title:'Purpose-Built',  desc:'Separate, focused experiences for seekers and recruiters' },
+              { icon:'🤖', title:'AI-Assisted',    desc:'Smart matching and career guidance powered by AI' },
+              { icon:'🔒', title:'Trusted',         desc:'Verified employers and professional-grade security' },
+              { icon:'🚀', title:'Scalable',        desc:'Built for India\'s growing professional workforce' },
+            ].map(f => (
+              <div key={f.title} style={{ background:'white', borderRadius:'8px', border:'1px solid #ebebeb', padding:'16px', boxShadow:'0 1px 4px rgba(0,0,0,0.04)' }}>
+                <div style={{ fontSize:'1.4rem', marginBottom:'8px' }}>{f.icon}</div>
+                <h3 style={{ fontWeight:600, color:'#1a237e', fontSize:'14px', marginBottom:'4px' }}>{f.title}</h3>
+                <p style={{ color:'#666', fontSize:'13px', lineHeight:1.5 }}>{f.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          {[
-            { icon:'🎯', title:'Purpose-Built',  desc:'Separate, focused experiences for seekers and recruiters' },
-            { icon:'🤖', title:'AI-Assisted',    desc:'Smart matching and career guidance powered by AI' },
-            { icon:'🔒', title:'Trusted',         desc:'Verified employers and professional-grade security' },
-            { icon:'🚀', title:'Scalable',        desc:'Built for Pakistan\'s growing professional workforce' },
-          ].map(f => (
-            <div key={f.title} className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-              <div className="text-2xl mb-2">{f.icon}</div>
-              <h3 className="font-semibold text-[#0a2342] text-sm mb-1" style={{ fontFamily:'system-ui' }}>{f.title}</h3>
-              <p className="text-gray-500 text-xs leading-relaxed" style={{ fontFamily:'system-ui' }}>{f.desc}</p>
-            </div>
-          ))}
-        </div>
+        <style>{`.about-grid { } @media(min-width:768px){ .about-grid{ grid-template-columns:1fr 1fr; } }`}</style>
       </section>
 
-      <section style={{ background:'#f8fafc' }} className="py-16 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 style={{ fontFamily:"'Georgia',serif", color:'#0a2342', fontSize:'1.8rem', fontWeight:700 }} className="mb-10">
-            Platform by the Numbers
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <section style={{ background:'white', borderTop:'1px solid #e0e0e0', borderBottom:'1px solid #e0e0e0', padding:'40px 16px' }}>
+        <div style={{ maxWidth:W, margin:'0 auto', textAlign:'center' }}>
+          <h2 style={{ fontWeight:700, fontSize:'20px', color:'#1a237e', marginBottom:'28px' }}>Platform by the Numbers</h2>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:'16px', maxWidth:'700px', margin:'0 auto' }}>
             {[
               { value:'2,400+', label:'Active Vacancies' },
               { value:'850+',   label:'Partner Companies' },
-              { value:'18,000+', label:'Registered Professionals' },
+              { value:'18,000+',label:'Registered Professionals' },
               { value:'94%',    label:'Placement Rate' },
             ].map(s => (
-              <div key={s.label} className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-                <div style={{ color:'#c9a84c', fontFamily:'system-ui', fontSize:'1.8rem', fontWeight:700 }}>{s.value}</div>
-                <div className="text-gray-500 text-sm mt-1" style={{ fontFamily:'system-ui' }}>{s.label}</div>
+              <div key={s.label} style={{ background:'#f9f9f9', borderRadius:'8px', border:'1px solid #ebebeb', padding:'20px' }}>
+                <div style={{ color:'#FF9933', fontWeight:700, fontSize:'1.6rem' }}>{s.value}</div>
+                <div style={{ color:'#666', fontSize:'13px', marginTop:'4px' }}>{s.label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-16 px-4 text-center" style={{ background:'linear-gradient(135deg,#0a2342,#0d3060)' }}>
-        <h2 style={{ fontFamily:"'Georgia',serif", fontSize:'2rem', fontWeight:700, color:'white' }} className="mb-3">
-          Join the IIPA Community
-        </h2>
-        <p className="text-gray-300 mb-8" style={{ fontFamily:'system-ui' }}>Start your journey today — it's free.</p>
-        <div className="flex justify-center gap-4 flex-wrap">
-          <Link to="/register"
-            style={{ background:'#c9a84c', fontFamily:'system-ui', fontWeight:600 }}
-            className="px-8 py-3 rounded-xl text-[#0a2342] hover:bg-yellow-400 transition">
-            Create Account
-          </Link>
-          <Link to="/jobs"
-            style={{ fontFamily:'system-ui' }}
-            className="px-8 py-3 rounded-xl border border-white/30 text-white hover:bg-white/10 transition">
-            Browse Jobs
-          </Link>
+      <section style={{ background:'#1a237e', padding:'48px 16px', textAlign:'center' }}>
+        <h2 style={{ fontWeight:700, fontSize:'1.6rem', color:'white', marginBottom:'8px' }}>Join the IIPA Community</h2>
+        <p style={{ color:'rgba(255,255,255,0.7)', marginBottom:'24px', fontSize:'14px' }}>Start your journey today — it's free.</p>
+        <div style={{ display:'flex', justifyContent:'center', gap:'12px', flexWrap:'wrap' }}>
+          <Link to="/register" style={{ background:'#FF9933', color:'#1a237e', fontWeight:700, fontSize:'14px', padding:'10px 28px', borderRadius:'20px' }}>Create Account</Link>
+          <Link to="/jobs" style={{ color:'white', fontSize:'14px', padding:'10px 28px', border:'1px solid rgba(255,255,255,0.35)', borderRadius:'20px' }}>Browse Jobs</Link>
         </div>
       </section>
     </div>

@@ -2,41 +2,40 @@ import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
-    <footer className="bg-[#1a237e] text-gray-300 mt-auto">
-      {/* tricolor bar at top of footer */}
-      <div className="h-1 w-full" style={{ background: 'linear-gradient(to right, #FF9933 33.33%, #ffffff 33.33%, #ffffff 66.66%, #138808 66.66%)' }} />
-      <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer style={{ background:'#1a237e', color:'rgba(255,255,255,0.75)', marginTop:'auto' }}>
+      <div className="tricolor" />
+      <div style={{ maxWidth:'1128px', margin:'0 auto', padding:'40px 16px 24px', display:'grid', gap:'32px', gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))' }}>
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-[#FF9933] font-bold text-xl">IIPA</span>
-            <span className="text-white font-semibold">Job Forum</span>
+          <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'10px' }}>
+            <span style={{ color:'#FF9933', fontWeight:700, fontSize:'18px' }}>IIPA</span>
+            <span style={{ color:'white', fontWeight:600, fontSize:'15px' }}>Job Forum</span>
           </div>
-          <p className="text-sm leading-relaxed">Your trusted career partner — connecting professionals with leading employers across India.</p>
+          <p style={{ fontSize:'13px', lineHeight:1.6 }}>Your trusted career partner — connecting professionals with leading employers across India.</p>
         </div>
         <div>
-          <h4 className="text-white font-semibold mb-3">For Job Seekers</h4>
-          <ul className="space-y-2 text-sm">
-            <li><Link to="/jobs"             className="hover:text-[#FF9933]">Browse Jobs</Link></li>
-            <li><Link to="/register"         className="hover:text-[#FF9933]">Create Profile</Link></li>
-            <li><Link to="/seeker/dashboard" className="hover:text-[#FF9933]">My Applications</Link></li>
-          </ul>
+          <h4 style={{ color:'white', fontWeight:600, fontSize:'14px', marginBottom:'12px' }}>For Job Seekers</h4>
+          <div style={{ display:'flex', flexDirection:'column', gap:'8px', fontSize:'13px' }}>
+            <Link to="/jobs"             style={{ color:'rgba(255,255,255,0.65)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>Browse Jobs</Link>
+            <Link to="/register"         style={{ color:'rgba(255,255,255,0.65)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>Create Profile</Link>
+            <Link to="/seeker/dashboard" style={{ color:'rgba(255,255,255,0.65)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>My Applications</Link>
+          </div>
         </div>
         <div>
-          <h4 className="text-white font-semibold mb-3">For Employers</h4>
-          <ul className="space-y-2 text-sm">
-            <li><Link to="/register"            className="hover:text-[#FF9933]">Post a Job</Link></li>
-            <li><Link to="/recruiter/dashboard" className="hover:text-[#FF9933]">Recruiter Dashboard</Link></li>
-          </ul>
+          <h4 style={{ color:'white', fontWeight:600, fontSize:'14px', marginBottom:'12px' }}>For Employers</h4>
+          <div style={{ display:'flex', flexDirection:'column', gap:'8px', fontSize:'13px' }}>
+            <Link to="/register"            style={{ color:'rgba(255,255,255,0.65)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>Post a Job</Link>
+            <Link to="/recruiter/dashboard" style={{ color:'rgba(255,255,255,0.65)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>Recruiter Dashboard</Link>
+          </div>
         </div>
         <div>
-          <h4 className="text-white font-semibold mb-3">Company</h4>
-          <ul className="space-y-2 text-sm">
-            <li><Link to="/about"   className="hover:text-[#FF9933]">About Us</Link></li>
-            <li><Link to="/contact" className="hover:text-[#FF9933]">Contact</Link></li>
-          </ul>
+          <h4 style={{ color:'white', fontWeight:600, fontSize:'14px', marginBottom:'12px' }}>Company</h4>
+          <div style={{ display:'flex', flexDirection:'column', gap:'8px', fontSize:'13px' }}>
+            <Link to="/about"   style={{ color:'rgba(255,255,255,0.65)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>About Us</Link>
+            <Link to="/contact" style={{ color:'rgba(255,255,255,0.65)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>Contact</Link>
+          </div>
         </div>
       </div>
-      <div className="border-t border-white/10 text-center py-4 text-xs text-gray-500">
+      <div style={{ borderTop:'1px solid rgba(255,255,255,0.1)', textAlign:'center', padding:'16px', fontSize:'12px', color:'rgba(255,255,255,0.4)' }}>
         © {new Date().getFullYear()} IIPA Job Forum. All rights reserved.
       </div>
     </footer>

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+const F = "inherit";
+
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -10,89 +12,85 @@ export default function Navbar() {
   const handleLogout = () => { logout(); navigate('/'); setOpen(false); };
 
   return (
-    <nav className="bg-[#1a237e] text-white shadow-lg sticky top-0 z-50">
-      {/* tricolor top bar */}
-      <div className="h-1 w-full" style={{ background: 'linear-gradient(to right, #FF9933 33.33%, #ffffff 33.33%, #ffffff 66.66%, #138808 66.66%)' }} />
+    <nav style={{ background:'#1a237e', position:'sticky', top:0, zIndex:50, boxShadow:'0 1px 3px rgba(0,0,0,0.2)' }}>
+      <div className="tricolor" />
+      <div style={{ maxWidth:'1128px', margin:'0 auto', padding:'0 16px', display:'flex', alignItems:'center', justifyContent:'space-between', height:'52px' }}>
 
-      <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-          <span className="text-[#FF9933] font-bold text-xl">IIPA</span>
-          <span className="font-semibold text-white text-lg">Job Forum</span>
+        <Link to="/" onClick={() => setOpen(false)} style={{ display:'flex', alignItems:'center', gap:'6px' }}>
+          <span style={{ color:'#FF9933', fontWeight:700, fontSize:'18px' }}>IIPA</span>
+          <span style={{ color:'white', fontWeight:600, fontSize:'16px' }}>Job Forum</span>
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-6 text-sm">
-          <Link to="/jobs"    className="hover:text-[#FF9933] transition-colors">Find Jobs</Link>
-          <Link to="/about"   className="hover:text-[#FF9933] transition-colors">About</Link>
-          <Link to="/contact" className="hover:text-[#FF9933] transition-colors">Contact</Link>
+        <div style={{ display:'flex', alignItems:'center', gap:'24px', fontSize:'14px' }} className="desk-nav">
+          <Link to="/jobs"    style={{ color:'rgba(255,255,255,0.85)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.85)'}>Find Jobs</Link>
+          <Link to="/about"   style={{ color:'rgba(255,255,255,0.85)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.85)'}>About</Link>
+          <Link to="/contact" style={{ color:'rgba(255,255,255,0.85)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.85)'}>Contact</Link>
         </div>
 
         {/* Desktop auth */}
-        <div className="hidden md:flex items-center gap-3">
+        <div style={{ display:'flex', alignItems:'center', gap:'12px' }} className="desk-nav">
           {user ? (
             <>
-              <Link
-                to={user.role === 'recruiter' ? '/recruiter/dashboard' : '/seeker/dashboard'}
-                className="text-sm hover:text-[#FF9933] transition-colors truncate max-w-[140px]"
-              >
+              <Link to={user.role==='recruiter' ? '/recruiter/dashboard' : '/seeker/dashboard'}
+                style={{ color:'rgba(255,255,255,0.85)', fontSize:'14px', maxWidth:'140px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
                 {user.fullName}
               </Link>
-              <button
-                onClick={handleLogout}
-                className="bg-[#FF9933] text-[#1a237e] text-sm font-semibold px-4 py-1.5 rounded-full hover:bg-orange-400 transition"
-              >
+              <button onClick={handleLogout}
+                style={{ background:'#FF9933', color:'#1a237e', fontWeight:600, fontSize:'13px', padding:'6px 16px', borderRadius:'16px', border:'none' }}>
                 Logout
               </button>
             </>
           ) : (
             <>
-              <Link to="/login"    className="text-sm hover:text-[#FF9933] transition-colors">Sign In</Link>
-              <Link to="/register" className="bg-[#FF9933] text-[#1a237e] text-sm font-semibold px-4 py-1.5 rounded-full hover:bg-orange-400 transition">
+              <Link to="/login" style={{ color:'rgba(255,255,255,0.85)', fontSize:'14px' }}>Sign In</Link>
+              <Link to="/register"
+                style={{ background:'#FF9933', color:'#1a237e', fontWeight:600, fontSize:'13px', padding:'6px 16px', borderRadius:'16px' }}>
                 Get Started
               </Link>
             </>
           )}
         </div>
 
-        {/* Mobile hamburger */}
-        <button
-          onClick={() => setOpen(o => !o)}
-          className="md:hidden flex flex-col justify-center items-center w-8 h-8 gap-1.5"
-          aria-label="Toggle menu"
-        >
-          <span className={`block w-6 h-0.5 bg-white transition-all duration-200 ${open ? 'rotate-45 translate-y-2' : ''}`} />
-          <span className={`block w-6 h-0.5 bg-white transition-all duration-200 ${open ? 'opacity-0' : ''}`} />
-          <span className={`block w-6 h-0.5 bg-white transition-all duration-200 ${open ? '-rotate-45 -translate-y-2' : ''}`} />
+        {/* Hamburger */}
+        <button onClick={() => setOpen(o => !o)} className="mob-menu"
+          style={{ background:'none', border:'none', display:'flex', flexDirection:'column', gap:'5px', padding:'4px' }}>
+          <span style={{ display:'block', width:'22px', height:'2px', background:'white', borderRadius:'2px', transition:'all 0.2s', transform: open ? 'rotate(45deg) translate(5px,5px)' : 'none' }} />
+          <span style={{ display:'block', width:'22px', height:'2px', background:'white', borderRadius:'2px', opacity: open ? 0 : 1, transition:'all 0.2s' }} />
+          <span style={{ display:'block', width:'22px', height:'2px', background:'white', borderRadius:'2px', transition:'all 0.2s', transform: open ? 'rotate(-45deg) translate(5px,-5px)' : 'none' }} />
         </button>
       </div>
 
-      {/* Mobile dropdown */}
+      {/* Mobile menu */}
       {open && (
-        <div className="md:hidden bg-[#1a237e] border-t border-white/10 px-4 py-4 flex flex-col gap-4 text-sm">
-          <Link to="/jobs"    onClick={() => setOpen(false)} className="hover:text-[#FF9933] transition-colors py-1">Find Jobs</Link>
-          <Link to="/about"   onClick={() => setOpen(false)} className="hover:text-[#FF9933] transition-colors py-1">About</Link>
-          <Link to="/contact" onClick={() => setOpen(false)} className="hover:text-[#FF9933] transition-colors py-1">Contact</Link>
-          <div className="border-t border-white/10 pt-3 flex flex-col gap-3">
+        <div style={{ background:'#1a237e', borderTop:'1px solid rgba(255,255,255,0.1)', padding:'12px 16px 16px', display:'flex', flexDirection:'column', gap:'4px' }}>
+          {[['Find Jobs','/jobs'],['About','/about'],['Contact','/contact']].map(([label,path]) => (
+            <Link key={path} to={path} onClick={() => setOpen(false)}
+              style={{ color:'rgba(255,255,255,0.85)', fontSize:'15px', padding:'8px 0', borderBottom:'1px solid rgba(255,255,255,0.07)' }}>
+              {label}
+            </Link>
+          ))}
+          <div style={{ paddingTop:'12px', display:'flex', flexDirection:'column', gap:'8px' }}>
             {user ? (
               <>
-                <Link
-                  to={user.role === 'recruiter' ? '/recruiter/dashboard' : '/seeker/dashboard'}
-                  onClick={() => setOpen(false)}
-                  className="hover:text-[#FF9933] transition-colors py-1"
-                >
+                <Link to={user.role==='recruiter' ? '/recruiter/dashboard' : '/seeker/dashboard'} onClick={() => setOpen(false)}
+                  style={{ color:'rgba(255,255,255,0.85)', fontSize:'15px' }}>
                   {user.fullName}
                 </Link>
                 <button onClick={handleLogout}
-                  className="bg-[#FF9933] text-[#1a237e] font-semibold px-4 py-2 rounded-full hover:bg-orange-400 transition text-left">
+                  style={{ background:'#FF9933', color:'#1a237e', fontWeight:600, fontSize:'14px', padding:'10px', borderRadius:'8px', border:'none', textAlign:'center' }}>
                   Logout
                 </button>
               </>
             ) : (
               <>
-                <Link to="/login"    onClick={() => setOpen(false)} className="hover:text-[#FF9933] transition-colors py-1">Sign In</Link>
+                <Link to="/login" onClick={() => setOpen(false)}
+                  style={{ color:'rgba(255,255,255,0.85)', fontSize:'15px', textAlign:'center', padding:'10px', border:'1px solid rgba(255,255,255,0.3)', borderRadius:'8px' }}>
+                  Sign In
+                </Link>
                 <Link to="/register" onClick={() => setOpen(false)}
-                  className="bg-[#FF9933] text-[#1a237e] font-semibold px-4 py-2 rounded-full hover:bg-orange-400 transition text-center">
+                  style={{ background:'#FF9933', color:'#1a237e', fontWeight:600, fontSize:'14px', padding:'10px', borderRadius:'8px', textAlign:'center' }}>
                   Get Started
                 </Link>
               </>
@@ -100,6 +98,15 @@ export default function Navbar() {
           </div>
         </div>
       )}
+
+      <style>{`
+        .desk-nav { display: flex; }
+        .mob-menu { display: none; }
+        @media (max-width: 767px) {
+          .desk-nav { display: none !important; }
+          .mob-menu { display: flex !important; }
+        }
+      `}</style>
     </nav>
   );
 }

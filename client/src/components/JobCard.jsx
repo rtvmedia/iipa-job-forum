@@ -1,46 +1,53 @@
 import { Link } from 'react-router-dom';
 
 const TYPE_COLORS = {
-  'full-time':  'bg-green-100 text-green-700',
-  'part-time':  'bg-blue-100 text-blue-700',
-  'contract':   'bg-orange-100 text-orange-700',
-  'remote':     'bg-purple-100 text-purple-700',
-  'internship': 'bg-pink-100 text-pink-700',
+  'full-time':  { bg:'#e8f5e9', color:'#2e7d32' },
+  'part-time':  { bg:'#e3f2fd', color:'#1565c0' },
+  'contract':   { bg:'#fff3e0', color:'#e65100' },
+  'remote':     { bg:'#f3e5f5', color:'#6a1b9a' },
+  'internship': { bg:'#fce4ec', color:'#880e4f' },
 };
 
 export default function JobCard({ job }) {
   const salary = job.salaryMin
-    ? `₹ ${(job.salaryMin / 1000).toFixed(0)}k – ${(job.salaryMax / 1000).toFixed(0)}k`
+    ? `₹ ${(job.salaryMin/1000).toFixed(0)}k – ${(job.salaryMax/1000).toFixed(0)}k`
     : 'Salary not disclosed';
+  const tc = TYPE_COLORS[job.type] || { bg:'#f5f5f5', color:'#555' };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex-1 min-w-0">
-          <Link to={`/jobs/${job.id}`} className="font-semibold text-[#1a237e] hover:text-[#FF9933] text-lg leading-tight block truncate">
+    <div style={{ background:'white', borderRadius:'8px', boxShadow:'0 0 0 1px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04)', padding:'16px', transition:'box-shadow 0.2s' }}
+      onMouseEnter={e => e.currentTarget.style.boxShadow='0 0 0 1px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.08)'}
+      onMouseLeave={e => e.currentTarget.style.boxShadow='0 0 0 1px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04)'}>
+
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'8px', marginBottom:'8px' }}>
+        <div style={{ flex:1, minWidth:0 }}>
+          <Link to={`/jobs/${job.id}`} style={{ fontWeight:600, color:'#1a237e', fontSize:'15px', display:'block' }}
+            onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='#1a237e'}>
             {job.title}
           </Link>
-          <p className="text-gray-500 text-sm mt-1">{job.company}</p>
+          <p style={{ color:'#666', fontSize:'13px', marginTop:'2px' }}>{job.company}</p>
         </div>
-        <span className={`text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap ${TYPE_COLORS[job.type] || 'bg-gray-100 text-gray-600'}`}>
+        <span style={{ background:tc.bg, color:tc.color, fontSize:'11px', fontWeight:600, padding:'3px 10px', borderRadius:'12px', whiteSpace:'nowrap', textTransform:'capitalize' }}>
           {job.type}
         </span>
       </div>
 
-      <div className="flex flex-wrap gap-3 mt-3 text-sm text-gray-500">
+      <div style={{ display:'flex', flexWrap:'wrap', gap:'12px', fontSize:'13px', color:'#666', marginBottom:'10px' }}>
         <span>📍 {job.location || 'India'}</span>
         <span>💼 {job.category || 'General'}</span>
-        <span>💰 {salary}</span>
+        <span style={{ color:'#138808', fontWeight:500 }}>💰 {salary}</span>
       </div>
 
       {job.deadline && (
-        <p className="text-xs text-gray-400 mt-3">Deadline: {new Date(job.deadline).toLocaleDateString()}</p>
+        <p style={{ fontSize:'12px', color:'#999', marginBottom:'10px' }}>
+          Deadline: {new Date(job.deadline).toLocaleDateString('en-IN')}
+        </p>
       )}
 
-      <Link
-        to={`/jobs/${job.id}`}
-        className="mt-4 inline-block bg-[#1a237e] text-white text-sm px-4 py-2 rounded-lg hover:bg-[#283593] transition"
-      >
+      <Link to={`/jobs/${job.id}`}
+        style={{ display:'inline-block', fontSize:'13px', fontWeight:600, color:'#1a237e', border:'1px solid #1a237e', padding:'5px 14px', borderRadius:'16px', transition:'all 0.15s' }}
+        onMouseEnter={e=>{ e.currentTarget.style.background='#1a237e'; e.currentTarget.style.color='white'; }}
+        onMouseLeave={e=>{ e.currentTarget.style.background='transparent'; e.currentTarget.style.color='#1a237e'; }}>
         View Details
       </Link>
     </div>
