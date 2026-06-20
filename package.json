@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "IIPA Job Forum - Full Stack Recruitment Platform",
   "scripts": {
-    "build": "cd server && npm install && cd ../client && npm install && npm run build",
+    "build": "cd server && npm install && cd ../client && npm install --include=dev && npm run build",
     "start": "cd server && node index.js",
     "server": "cd server && npm run dev",
     "client": "cd client && npm run dev",
