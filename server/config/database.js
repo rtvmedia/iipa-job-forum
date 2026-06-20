@@ -1,5 +1,6 @@
 const { Sequelize } = require('sequelize');
-require('dotenv').config();
+// dotenv only loads if variables not already set (won't override Hostinger's injected env vars)
+require('dotenv').config({ override: false });
 
 const sequelize = new Sequelize(
   process.env.DB_NAME,
