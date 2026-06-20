@@ -10,14 +10,14 @@ const TYPE_COLORS = {
 
 export default function JobCard({ job }) {
   const salary = job.salaryMin
-    ? `PKR ${(job.salaryMin / 1000).toFixed(0)}k – ${(job.salaryMax / 1000).toFixed(0)}k`
+    ? `₹ ${(job.salaryMin / 1000).toFixed(0)}k – ${(job.salaryMax / 1000).toFixed(0)}k`
     : 'Salary not disclosed';
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <Link to={`/jobs/${job.id}`} className="font-semibold text-[#0a2342] hover:text-[#c9a84c] text-lg leading-tight block truncate">
+          <Link to={`/jobs/${job.id}`} className="font-semibold text-[#1a237e] hover:text-[#FF9933] text-lg leading-tight block truncate">
             {job.title}
           </Link>
           <p className="text-gray-500 text-sm mt-1">{job.company}</p>
@@ -28,7 +28,7 @@ export default function JobCard({ job }) {
       </div>
 
       <div className="flex flex-wrap gap-3 mt-3 text-sm text-gray-500">
-        <span>📍 {job.location || 'Pakistan'}</span>
+        <span>📍 {job.location || 'India'}</span>
         <span>💼 {job.category || 'General'}</span>
         <span>💰 {salary}</span>
       </div>
@@ -39,7 +39,7 @@ export default function JobCard({ job }) {
 
       <Link
         to={`/jobs/${job.id}`}
-        className="mt-4 inline-block bg-[#0a2342] text-white text-sm px-4 py-2 rounded-lg hover:bg-[#0d2d59] transition"
+        className="mt-4 inline-block bg-[#1a237e] text-white text-sm px-4 py-2 rounded-lg hover:bg-[#283593] transition"
       >
         View Details
       </Link>
