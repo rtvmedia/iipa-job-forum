@@ -5,6 +5,7 @@ import JobCard from '../../components/JobCard';
 
 const TYPES      = ['full-time','part-time','contract','remote','internship'];
 const CATEGORIES = ['Technology','Finance','Human Resources','Marketing','Engineering','Healthcare','Education','Sales'];
+const BLUE = '#0a66c2';
 
 export default function Jobs() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,10 +23,7 @@ export default function Jobs() {
     if (search)   params.search   = search;
     if (category) params.category = category;
     if (type)     params.type     = type;
-    api.get('/jobs', { params })
-      .then(r => setJobs(r.data))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    api.get('/jobs', { params }).then(r => setJobs(r.data)).catch(()=>{}).finally(() => setLoading(false));
   }, [search, category, type]);
 
   const set = (key, val) => {
@@ -34,101 +32,80 @@ export default function Jobs() {
     setSearchParams(p);
   };
 
+  const inp = { width:'100%', border:'1px solid #ddd', borderRadius:'6px', padding:'8px 10px', fontSize:'13px', outline:'none', boxSizing:'border-box' };
+
   const FilterPanel = () => (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-      <h3 className="font-semibold text-[#1a237e] mb-4 text-sm" style={{ fontFamily:'system-ui' }}>Filters</h3>
-
-      <div className="mb-5">
-        <input
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#1a237e] transition"
-          style={{ fontFamily:'system-ui' }}
-          placeholder="Search jobs..."
+    <div style={{ background:'#fff', borderRadius:'8px', border:'1px solid #e0e0e0', padding:'16px' }}>
+      <h3 style={{ fontWeight:700, color:'#1a1a1a', fontSize:'14px', marginBottom:'14px' }}>Filters</h3>
+      <div style={{ marginBottom:'16px' }}>
+        <input style={inp} placeholder="Search jobs..."
           defaultValue={search}
-          onKeyDown={e => e.key === 'Enter' && set('search', e.target.value)}
-        />
+          onFocus={e=>e.target.style.borderColor=BLUE} onBlur={e=>e.target.style.borderColor='#ddd'}
+          onKeyDown={e => e.key==='Enter' && set('search', e.target.value)} />
       </div>
-
-      <div className="mb-5">
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2" style={{ fontFamily:'system-ui' }}>Job Type</p>
+      <div style={{ marginBottom:'16px' }}>
+        <p style={{ fontSize:'11px', fontWeight:700, color:'#888', textTransform:'uppercase', letterSpacing:'0.06em', marginBottom:'8px' }}>Job Type</p>
         {TYPES.map(t => (
-          <label key={t} className="flex items-center gap-2 py-1 cursor-pointer">
+          <label key={t} style={{ display:'flex', alignItems:'center', gap:'8px', padding:'4px 0', cursor:'pointer' }}>
             <input type="radio" name="type" checked={type===t} onChange={() => set('type', type===t ? '' : t)}
-              className="accent-[#1a237e]" />
-            <span className="text-sm text-gray-700 capitalize" style={{ fontFamily:'system-ui' }}>{t}</span>
+              style={{ accentColor:BLUE }} />
+            <span style={{ fontSize:'13px', color:'#333', textTransform:'capitalize' }}>{t}</span>
           </label>
         ))}
-        {type && (
-          <button onClick={() => set('type','')} className="text-xs text-[#FF9933] mt-1 hover:underline" style={{ fontFamily:'system-ui' }}>
-            Clear
-          </button>
-        )}
+        {type && <button onClick={() => set('type','')} style={{ fontSize:'12px', color:BLUE, background:'none', border:'none', cursor:'pointer', padding:'4px 0' }}>Clear</button>}
       </div>
-
       <div>
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2" style={{ fontFamily:'system-ui' }}>Category</p>
+        <p style={{ fontSize:'11px', fontWeight:700, color:'#888', textTransform:'uppercase', letterSpacing:'0.06em', marginBottom:'8px' }}>Category</p>
         {CATEGORIES.map(c => (
-          <label key={c} className="flex items-center gap-2 py-1 cursor-pointer">
+          <label key={c} style={{ display:'flex', alignItems:'center', gap:'8px', padding:'4px 0', cursor:'pointer' }}>
             <input type="radio" name="cat" checked={category===c} onChange={() => set('category', category===c ? '' : c)}
-              className="accent-[#1a237e]" />
-            <span className="text-sm text-gray-700" style={{ fontFamily:'system-ui' }}>{c}</span>
+              style={{ accentColor:BLUE }} />
+            <span style={{ fontSize:'13px', color:'#333' }}>{c}</span>
           </label>
         ))}
-        {category && (
-          <button onClick={() => set('category','')} className="text-xs text-[#FF9933] mt-1 hover:underline" style={{ fontFamily:'system-ui' }}>
-            Clear
-          </button>
-        )}
+        {category && <button onClick={() => set('category','')} style={{ fontSize:'12px', color:BLUE, background:'none', border:'none', cursor:'pointer', padding:'4px 0' }}>Clear</button>}
       </div>
     </div>
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 md:py-10">
-      {/* Page header */}
-      <div className="mb-6">
-        <h1 style={{ fontFamily:"'Georgia',serif", color:'#1a237e', fontWeight:700 }}
-          className="text-2xl md:text-3xl">
-          Find Your Next Role
-        </h1>
-        <p className="text-gray-500 mt-1 text-sm" style={{ fontFamily:'system-ui' }}>{jobs.length} jobs found</p>
+    <div style={{ maxWidth:'1128px', margin:'0 auto', padding:'24px 16px' }}>
+      <div style={{ marginBottom:'20px' }}>
+        <h1 style={{ fontWeight:700, color:'#1a1a1a', fontSize:'22px' }}>Find Your Next Role</h1>
+        <p style={{ color:'#666', fontSize:'13px', marginTop:'4px' }}>{jobs.length} jobs found</p>
       </div>
 
       {/* Mobile filter toggle */}
-      <button
-        onClick={() => setShowFilters(f => !f)}
-        className="lg:hidden mb-4 flex items-center gap-2 text-sm font-semibold text-[#1a237e] border border-[#1a237e] px-4 py-2 rounded-lg hover:bg-[#1a237e] hover:text-white transition"
-        style={{ fontFamily:'system-ui' }}
-      >
-        <span>⚙</span>
-        {showFilters ? 'Hide Filters' : 'Show Filters'}
+      <button onClick={() => setShowFilters(f=>!f)}
+        style={{ display:'none', marginBottom:'14px', alignItems:'center', gap:'6px', fontSize:'13px', fontWeight:600, color:BLUE, border:`1px solid ${BLUE}`, padding:'7px 16px', borderRadius:'16px', background:'#fff', cursor:'pointer' }}
+        className="mob-filter-btn">
+        ⚙ {showFilters ? 'Hide Filters' : 'Show Filters'}
       </button>
 
-      {/* Mobile filters (collapsible) */}
-      {showFilters && (
-        <div className="lg:hidden mb-6">
-          <FilterPanel />
-        </div>
-      )}
+      <style>{`
+        @media(max-width:1023px){ .mob-filter-btn{ display:flex !important; } }
+        @media(max-width:1023px){ .desk-filters{ display:none !important; } }
+        @media(max-width:1023px){ .mob-filters{ display:block !important; } }
+        .mob-filters { display:none; margin-bottom:16px; }
+        .jobs-layout { display:flex; gap:20px; }
+        .desk-filters { width:224px; flex-shrink:0; }
+        .jobs-main { flex:1; min-width:0; }
+      `}</style>
 
-      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-        {/* Desktop sidebar filters */}
-        <aside className="hidden lg:block lg:w-64 shrink-0">
-          <div className="sticky top-20">
-            <FilterPanel />
-          </div>
-        </aside>
+      {showFilters && <div className="mob-filters"><FilterPanel /></div>}
 
-        {/* Job list */}
-        <main className="flex-1 min-w-0">
+      <div className="jobs-layout">
+        <aside className="desk-filters"><div style={{ position:'sticky', top:'72px' }}><FilterPanel /></div></aside>
+        <main className="jobs-main">
           {loading ? (
-            <div className="text-center py-20 text-gray-400" style={{ fontFamily:'system-ui' }}>Loading jobs...</div>
+            <div style={{ textAlign:'center', padding:'60px 0', color:'#999' }}>Loading jobs...</div>
           ) : jobs.length === 0 ? (
-            <div className="text-center py-20">
-              <div className="text-5xl mb-4">🔍</div>
-              <p className="text-gray-500 text-sm" style={{ fontFamily:'system-ui' }}>No jobs match your search. Try adjusting the filters.</p>
+            <div style={{ textAlign:'center', padding:'60px 0' }}>
+              <div style={{ fontSize:'2.5rem', marginBottom:'10px' }}>🔍</div>
+              <p style={{ color:'#666', fontSize:'14px' }}>No jobs match your filters. Try adjusting your search.</p>
             </div>
           ) : (
-            <div className="grid gap-4">
+            <div style={{ display:'grid', gap:'10px' }}>
               {jobs.map(job => <JobCard key={job.id} job={job} />)}
             </div>
           )}

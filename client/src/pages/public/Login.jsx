@@ -2,11 +2,14 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
+const BLUE = '#0a66c2';
+const inp = { width:'100%', border:'1px solid #ddd', borderRadius:'6px', padding:'10px 12px', fontSize:'14px', outline:'none', boxSizing:'border-box' };
+
 export default function Login() {
   const { login } = useAuth();
   const navigate  = useNavigate();
-  const [form, setForm]     = useState({ email:'', password:'' });
-  const [error, setError]   = useState('');
+  const [form, setForm]       = useState({ email:'', password:'' });
+  const [error, setError]     = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async e => {
@@ -27,48 +30,41 @@ export default function Login() {
             <span style={{ color:'#FF9933', fontWeight:700, fontSize:'22px' }}>IIPA</span>
             <span style={{ color:'#1a237e', fontWeight:600, fontSize:'18px' }}>Job Forum</span>
           </Link>
-          <div style={{ display:'flex', justifyContent:'center', gap:'8px', margin:'10px 0 4px' }}>
-            <div style={{ width:'20px', height:'2px', background:'#FF9933', borderRadius:'2px' }} />
-            <div style={{ width:'20px', height:'2px', background:'#ccc', borderRadius:'2px' }} />
-            <div style={{ width:'20px', height:'2px', background:'#138808', borderRadius:'2px' }} />
-          </div>
-          <h1 style={{ fontWeight:700, color:'#1a237e', fontSize:'22px', marginTop:'12px' }}>Welcome Back</h1>
-          <p style={{ color:'#666', fontSize:'14px', marginTop:'4px' }}>Sign in to continue to your account</p>
+          <h1 style={{ fontWeight:700, color:'#1a1a1a', fontSize:'22px', marginTop:'16px' }}>Sign in</h1>
+          <p style={{ color:'#666', fontSize:'14px', marginTop:'4px' }}>Stay updated on your professional world</p>
         </div>
 
-        <div style={{ background:'white', borderRadius:'8px', boxShadow:'0 0 0 1px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.06)', padding:'28px 24px' }}>
-          <div style={{ background:'#fff8f0', border:'1px solid #ffe0b2', borderRadius:'6px', padding:'10px 14px', marginBottom:'20px', fontSize:'13px', color:'#bf360c' }}>
+        <div style={{ background:'#fff', borderRadius:'8px', boxShadow:'0 0 0 1px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.06)', padding:'24px' }}>
+          <div style={{ background:'#f0f7ff', border:'1px solid #c8e0f9', borderRadius:'6px', padding:'10px 14px', marginBottom:'18px', fontSize:'13px', color:'#004182' }}>
             <strong>Demo accounts:</strong><br />
             Seeker: seeker@iipa.org / password123<br />
             Recruiter: recruiter@iipa.org / password123
           </div>
 
-          <form onSubmit={handleSubmit} style={{ display:'flex', flexDirection:'column', gap:'16px' }}>
+          <form onSubmit={handleSubmit} style={{ display:'flex', flexDirection:'column', gap:'14px' }}>
             <div>
-              <label style={{ display:'block', fontSize:'13px', fontWeight:500, color:'#333', marginBottom:'6px' }}>Email</label>
+              <label style={{ display:'block', fontSize:'13px', fontWeight:500, color:'#333', marginBottom:'5px' }}>Email</label>
               <input type="email" required value={form.email} onChange={e => setForm(f=>({...f,email:e.target.value}))}
-                style={{ width:'100%', border:'1px solid #ddd', borderRadius:'6px', padding:'10px 12px', fontSize:'14px', outline:'none', boxSizing:'border-box' }}
-                onFocus={e=>e.target.style.borderColor='#1a237e'} onBlur={e=>e.target.style.borderColor='#ddd'}
+                style={inp} onFocus={e=>e.target.style.borderColor=BLUE} onBlur={e=>e.target.style.borderColor='#ddd'}
                 placeholder="you@example.com" />
             </div>
             <div>
-              <label style={{ display:'block', fontSize:'13px', fontWeight:500, color:'#333', marginBottom:'6px' }}>Password</label>
+              <label style={{ display:'block', fontSize:'13px', fontWeight:500, color:'#333', marginBottom:'5px' }}>Password</label>
               <input type="password" required value={form.password} onChange={e => setForm(f=>({...f,password:e.target.value}))}
-                style={{ width:'100%', border:'1px solid #ddd', borderRadius:'6px', padding:'10px 12px', fontSize:'14px', outline:'none', boxSizing:'border-box' }}
-                onFocus={e=>e.target.style.borderColor='#1a237e'} onBlur={e=>e.target.style.borderColor='#ddd'}
+                style={inp} onFocus={e=>e.target.style.borderColor=BLUE} onBlur={e=>e.target.style.borderColor='#ddd'}
                 placeholder="••••••••" />
             </div>
             {error && <p style={{ color:'#c62828', fontSize:'13px' }}>{error}</p>}
             <button type="submit" disabled={loading}
-              style={{ background:'#1a237e', color:'white', fontWeight:600, fontSize:'14px', padding:'11px', borderRadius:'6px', border:'none', opacity: loading ? 0.6 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}>
-              {loading ? 'Signing in…' : 'Sign In'}
+              style={{ background:BLUE, color:'#fff', fontWeight:700, fontSize:'15px', padding:'12px', borderRadius:'24px', border:'none', opacity:loading?0.65:1, cursor:loading?'not-allowed':'pointer', marginTop:'4px' }}>
+              {loading ? 'Signing in…' : 'Sign in'}
             </button>
           </form>
 
-          <p style={{ textAlign:'center', fontSize:'13px', color:'#666', marginTop:'20px' }}>
-            No account yet?{' '}
-            <Link to="/register" style={{ color:'#FF9933', fontWeight:600 }}>Create one</Link>
-          </p>
+          <div style={{ textAlign:'center', marginTop:'18px', paddingTop:'18px', borderTop:'1px solid #e0e0e0' }}>
+            <span style={{ fontSize:'13px', color:'#666' }}>New to IIPA Job Forum? </span>
+            <Link to="/register" style={{ color:BLUE, fontWeight:600, fontSize:'13px' }}>Join now</Link>
+          </div>
         </div>
       </div>
     </div>

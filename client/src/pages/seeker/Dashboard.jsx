@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
 
+const BLUE = '#0a66c2';
+
 const STATUS_STYLES = {
-  applied:     'bg-blue-100 text-blue-700',
-  shortlisted: 'bg-yellow-100 text-yellow-700',
-  interview:   'bg-purple-100 text-purple-700',
-  hired:       'bg-green-100 text-green-700',
-  rejected:    'bg-red-100 text-red-700',
+  applied:     { bg:'#e8f1fb', color:'#0a66c2' },
+  shortlisted: { bg:'#fff8e1', color:'#b45309' },
+  interview:   { bg:'#f3e8ff', color:'#6b21a8' },
+  hired:       { bg:'#e8f5e9', color:'#057642' },
+  rejected:    { bg:'#fce8e8', color:'#b91c1c' },
 };
 
 export default function SeekerDashboard() {
@@ -17,113 +19,90 @@ export default function SeekerDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/applications/my')
-      .then(r => setApplications(r.data))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    api.get('/applications/my').then(r => setApplications(r.data)).catch(()=>{}).finally(() => setLoading(false));
   }, []);
 
   const counts = {
     total:       applications.length,
-    shortlisted: applications.filter(a => a.status === 'shortlisted').length,
-    interview:   applications.filter(a => a.status === 'interview').length,
-    hired:       applications.filter(a => a.status === 'hired').length,
+    shortlisted: applications.filter(a => a.status==='shortlisted').length,
+    interview:   applications.filter(a => a.status==='interview').length,
+    hired:       applications.filter(a => a.status==='hired').length,
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 md:py-10">
+    <div style={{ maxWidth:'1000px', margin:'0 auto', padding:'24px 16px' }}>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+      <div style={{ display:'flex', flexWrap:'wrap', justifyContent:'space-between', alignItems:'flex-start', gap:'14px', marginBottom:'20px' }}>
         <div>
-          <h1 style={{ fontFamily:"'Georgia',serif", color:'#1a237e', fontWeight:700 }}
-            className="text-xl md:text-2xl lg:text-3xl">
+          <h1 style={{ fontWeight:700, color:'#1a1a1a', fontSize:'22px' }}>
             Welcome back, {user?.fullName?.split(' ')[0]}!
           </h1>
-          <p className="text-gray-500 text-sm mt-1" style={{ fontFamily:'system-ui' }}>
-            Track your job applications and career progress
-          </p>
+          <p style={{ color:'#666', fontSize:'13px', marginTop:'3px' }}>Track your job applications and career progress</p>
         </div>
-        <div className="flex gap-3 shrink-0">
+        <div style={{ display:'flex', gap:'8px', flexWrap:'wrap' }}>
           <Link to="/jobs"
-            style={{ background:'#FF9933', fontFamily:'system-ui', fontWeight:600 }}
-            className="px-4 py-2 rounded-xl text-[#1a237e] text-sm hover:bg-orange-400 transition">
+            style={{ background:BLUE, color:'#fff', fontWeight:600, fontSize:'13px', padding:'8px 18px', borderRadius:'16px' }}>
             🔍 Find Jobs
           </Link>
           <Link to="/seeker/profile"
-            style={{ fontFamily:'system-ui' }}
-            className="px-4 py-2 rounded-xl border border-gray-200 text-gray-700 text-sm hover:bg-gray-50 transition">
+            style={{ color:BLUE, fontSize:'13px', fontWeight:600, padding:'8px 18px', border:`1px solid ${BLUE}`, borderRadius:'16px', background:'#fff' }}>
             Edit Profile
           </Link>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4 mb-8">
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:'10px', marginBottom:'20px' }} className="stat-grid">
+        <style>{`@media(min-width:600px){ .stat-grid{ grid-template-columns:repeat(4,1fr) !important; } }`}</style>
         {[
-          { label:'Total Applied',  value: counts.total,       color:'#1a237e', bg:'#e8edf5' },
-          { label:'Shortlisted',    value: counts.shortlisted, color:'#92700a', bg:'#fef9e7' },
-          { label:'Interview',      value: counts.interview,   color:'#6b21a8', bg:'#f3e8ff' },
-          { label:'Hired',          value: counts.hired,       color:'#166534', bg:'#dcfce7' },
+          { label:'Total Applied',  value:counts.total,       bg:'#f0f7ff', color:BLUE },
+          { label:'Shortlisted',    value:counts.shortlisted, bg:'#fffbeb', color:'#b45309' },
+          { label:'Interview',      value:counts.interview,   bg:'#faf5ff', color:'#6b21a8' },
+          { label:'Hired',          value:counts.hired,       bg:'#f0fdf4', color:'#057642' },
         ].map(s => (
-          <div key={s.label} style={{ background: s.bg }} className="rounded-xl p-4 md:p-5 text-center">
-            <div style={{ color: s.color, fontFamily:'system-ui', fontWeight:700 }}
-              className="text-2xl md:text-3xl">
-              {s.value}
-            </div>
-            <div style={{ color: s.color, fontFamily:'system-ui' }}
-              className="text-xs mt-0.5 font-medium leading-tight">
-              {s.label}
-            </div>
+          <div key={s.label} style={{ background:s.bg, borderRadius:'8px', border:`1px solid ${s.bg}`, padding:'16px', textAlign:'center' }}>
+            <div style={{ color:s.color, fontWeight:700, fontSize:'1.7rem' }}>{s.value}</div>
+            <div style={{ color:s.color, fontSize:'12px', marginTop:'2px', fontWeight:500 }}>{s.label}</div>
           </div>
         ))}
       </div>
 
-      {/* Applications list */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
-        <div className="flex items-center justify-between px-5 md:px-6 py-4 border-b border-gray-100">
-          <h2 style={{ fontFamily:"'Georgia',serif", color:'#1a237e', fontWeight:700 }}
-            className="text-base md:text-lg">
-            My Applications
-          </h2>
+      {/* Applications */}
+      <div style={{ background:'#fff', borderRadius:'8px', border:'1px solid #e0e0e0' }}>
+        <div style={{ padding:'16px 20px', borderBottom:'1px solid #e8e8e8' }}>
+          <h2 style={{ fontWeight:700, color:'#1a1a1a', fontSize:'16px' }}>My Applications</h2>
         </div>
-
         {loading ? (
-          <div className="text-center py-12 text-gray-400 text-sm" style={{ fontFamily:'system-ui' }}>Loading...</div>
+          <div style={{ textAlign:'center', padding:'48px', color:'#999' }}>Loading...</div>
         ) : applications.length === 0 ? (
-          <div className="text-center py-16 px-4">
-            <div className="text-5xl mb-4">📭</div>
-            <p className="text-gray-500 mb-4 text-sm" style={{ fontFamily:'system-ui' }}>
-              You haven't applied to any jobs yet.
-            </p>
-            <Link to="/jobs"
-              style={{ background:'#1a237e', fontFamily:'system-ui', fontWeight:600 }}
-              className="inline-block px-6 py-2.5 rounded-xl text-white text-sm hover:bg-[#283593] transition">
-              Browse Jobs
-            </Link>
+          <div style={{ textAlign:'center', padding:'48px 16px' }}>
+            <div style={{ fontSize:'2.5rem', marginBottom:'10px' }}>📭</div>
+            <p style={{ color:'#666', fontSize:'14px', marginBottom:'16px' }}>You haven't applied to any jobs yet.</p>
+            <Link to="/jobs" style={{ background:BLUE, color:'#fff', fontWeight:600, fontSize:'13px', padding:'9px 22px', borderRadius:'16px' }}>Browse Jobs</Link>
           </div>
         ) : (
-          <div className="divide-y divide-gray-50">
-            {applications.map(app => (
-              <div key={app.id} className="px-5 md:px-6 py-4 flex items-center justify-between gap-3 hover:bg-gray-50 transition">
-                <div className="flex-1 min-w-0">
-                  <Link to={`/jobs/${app.jobId}`}
-                    className="font-semibold text-[#1a237e] hover:text-[#FF9933] transition text-sm block truncate"
-                    style={{ fontFamily:'system-ui' }}>
-                    {app.job?.title}
-                  </Link>
-                  <p className="text-gray-500 text-xs mt-0.5 truncate" style={{ fontFamily:'system-ui' }}>
-                    {app.job?.company} · {app.job?.location}
-                  </p>
-                  <p className="text-gray-400 text-xs mt-0.5" style={{ fontFamily:'system-ui' }}>
-                    Applied {new Date(app.createdAt).toLocaleDateString('en-IN')}
-                  </p>
+          <div>
+            {applications.map((app, i) => {
+              const st = STATUS_STYLES[app.status] || { bg:'#f5f5f5', color:'#444' };
+              return (
+                <div key={app.id} style={{ padding:'14px 20px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:'12px', borderBottom: i < applications.length-1 ? '1px solid #f0f0f0' : 'none' }}>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <Link to={`/jobs/${app.jobId}`} style={{ fontWeight:600, color:BLUE, fontSize:'14px', display:'block', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                      {app.job?.title}
+                    </Link>
+                    <p style={{ color:'#555', fontSize:'13px', marginTop:'2px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                      {app.job?.company} · {app.job?.location}
+                    </p>
+                    <p style={{ color:'#999', fontSize:'12px', marginTop:'2px' }}>
+                      Applied {new Date(app.createdAt).toLocaleDateString('en-IN')}
+                    </p>
+                  </div>
+                  <span style={{ background:st.bg, color:st.color, fontSize:'12px', fontWeight:600, padding:'4px 12px', borderRadius:'12px', textTransform:'capitalize', whiteSpace:'nowrap', flexShrink:0 }}>
+                    {app.status}
+                  </span>
                 </div>
-                <span className={`text-xs font-medium px-2.5 py-1 rounded-full capitalize whitespace-nowrap shrink-0 ${STATUS_STYLES[app.status] || 'bg-gray-100 text-gray-600'}`}
-                  style={{ fontFamily:'system-ui' }}>
-                  {app.status}
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
