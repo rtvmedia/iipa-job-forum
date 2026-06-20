@@ -8,13 +8,13 @@ const app        = express();
 const isProd     = process.env.NODE_ENV === 'production';
 const clientDist = path.join(__dirname, '../client/dist');
 
-// Log env on startup for debugging
 console.log('ENV CHECK:', {
   NODE_ENV: process.env.NODE_ENV,
   PORT:     process.env.PORT,
   DB_HOST:  process.env.DB_HOST,
   DB_NAME:  process.env.DB_NAME,
   DB_USER:  process.env.DB_USER,
+  DB_PASS:  process.env.DB_PASS ? '***set***' : 'NOT SET',
 });
 
 app.use(cors({ origin: '*', credentials: false }));
@@ -26,15 +26,15 @@ app.use('/api/jobs',         require('./routes/jobs'));
 app.use('/api/applications', require('./routes/applications'));
 app.use('/api/news',         require('./routes/news'));
 app.use('/api/events',       require('./routes/events'));
+
 app.get('/api/health', (_, res) => res.json({
   status: 'ok',
   time: new Date(),
-  env: {
-    NODE_ENV: process.env.NODE_ENV,
-    DB_NAME:  process.env.DB_NAME,
-    DB_USER:  process.env.DB_USER,
-    DB_HOST:  process.env.DB_HOST,
-  }
+  db: sequelize.config ? {
+    host: sequelize.config.host,
+    database: sequelize.config.database,
+    username: sequelize.config.username,
+  } : 'not configured',
 }));
 
 // Serve React build in production
@@ -47,18 +47,16 @@ if (isProd) {
 
 const PORT = process.env.PORT || 8080;
 
+// Start server first, then connect DB
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
 sequelize.authenticate()
   .then(() => {
-    console.log('MySQL connected.');
+    console.log('MySQL connected successfully.');
     return sequelize.sync();
   })
-  .then(() => app.listen(PORT, () => console.log(`Server running on port ${PORT}`)))
+  .then(() => console.log('Tables synced.'))
   .catch(err => {
     console.error('DB connection failed:', err.message);
-    console.error('DB config used:', {
-      host: process.env.DB_HOST,
-      name: process.env.DB_NAME,
-      user: process.env.DB_USER,
-    });
-    process.exit(1);
+    // Don't exit — keep server running so we can debug
   });
