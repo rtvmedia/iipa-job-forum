@@ -2,11 +2,15 @@ const bcrypt = require('bcryptjs');
 const jwt    = require('jsonwebtoken');
 const { User } = require('../models');
 
+const PUBLIC_ROLES = ['seeker', 'recruiter'];
+
 const register = async (req, res) => {
   try {
     const { fullName, email, password, role, phone, location } = req.body;
     if (!fullName || !email || !password || !role)
       return res.status(400).json({ message: 'Missing required fields' });
+    if (!PUBLIC_ROLES.includes(role))
+      return res.status(400).json({ message: 'Invalid role' });
 
     const exists = await User.findOne({ where: { email } });
     if (exists) return res.status(409).json({ message: 'Email already registered' });
