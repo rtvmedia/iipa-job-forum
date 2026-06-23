@@ -6,10 +6,11 @@ export default function Footer() {
       <div className="tricolor" />
       <div style={{ maxWidth:'1128px', margin:'0 auto', padding:'40px 16px 24px', display:'grid', gap:'32px', gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))' }}>
         <div>
-          <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'10px' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'4px' }}>
             <span style={{ color:'#FF9933', fontWeight:700, fontSize:'18px' }}>IIPA</span>
-            <span style={{ color:'white', fontWeight:600, fontSize:'15px' }}>Job Forum</span>
+            <span style={{ color:'white', fontWeight:600, fontSize:'15px' }}>JOBS</span>
           </div>
+          <p style={{ fontSize:'12px', color:'rgba(255,255,255,0.5)', marginBottom:'10px' }}>Connecting Talents with Opportunities</p>
           <p style={{ fontSize:'13px', lineHeight:1.6 }}>Your trusted career partner — connecting professionals with leading employers across India.</p>
         </div>
         <div>
@@ -36,7 +37,7 @@ export default function Footer() {
         </div>
       </div>
       <div style={{ borderTop:'1px solid rgba(255,255,255,0.1)', textAlign:'center', padding:'16px', fontSize:'12px', color:'rgba(255,255,255,0.4)' }}>
-        © {new Date().getFullYear()} IIPA Job Forum. All rights reserved.
+        © {new Date().getFullYear()} IIPA JOBS. All rights reserved.
       </div>
     </footer>
   );

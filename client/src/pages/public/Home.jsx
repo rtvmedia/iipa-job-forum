@@ -2,13 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 
-const STATS = [
-  { value:'2,400+',  label:'Active Jobs' },
-  { value:'850+',    label:'Companies' },
-  { value:'18,000+', label:'Professionals' },
-  { value:'94%',     label:'Placement Rate' },
-];
-
 const CATEGORIES = [
   { name:'Technology',      icon:'💻', count:420 },
   { name:'Finance',         icon:'📊', count:310 },
@@ -25,66 +18,124 @@ const BLUE = '#0a66c2';
 const BLUE_DARK = '#004182';
 
 export default function Home() {
-  const [search, setSearch] = useState('');
-  const [jobs, setJobs]     = useState([]);
-  const [news, setNews]     = useState([]);
-  const [events, setEvents] = useState([]);
+  const [search, setSearch]   = useState('');
+  const [jobs, setJobs]       = useState([]);
+  const [allJobs, setAllJobs] = useState([]);
+  const [news, setNews]       = useState([]);
+  const [events, setEvents]   = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.get('/jobs?limit=6').then(r => setJobs(r.data.slice(0,6))).catch(()=>{});
+    api.get('/jobs').then(r => { setAllJobs(r.data); setJobs(r.data.slice(0,6)); }).catch(()=>{});
     api.get('/news').then(r => setNews(r.data.slice(0,3))).catch(()=>{});
     api.get('/events').then(r => setEvents(r.data.slice(0,4))).catch(()=>{});
   }, []);
 
   const handleSearch = e => { e.preventDefault(); navigate(`/jobs?search=${encodeURIComponent(search)}`); };
 
+  const activeJobs = allJobs.length;
+  const companies  = new Set(allJobs.map(j => j.company)).size;
+
+  const STATS = [
+    { value: activeJobs ? `${activeJobs}+` : '—', label:'Active Jobs' },
+    { value: companies  ? `${companies}+`  : '—', label:'Companies' },
+    { value:'18,000+', label:'Professionals' },
+    { value:'94%',     label:'Placement Rate' },
+  ];
+
   return (
     <div>
       <style>{`
-        .h-form { display:flex; flex-wrap:wrap; gap:8px; max-width:580px; margin:0 auto; }
-        .h-form input { flex:1 1 200px; min-width:0; padding:12px 16px; border-radius:6px; border:none; font-size:14px; outline:none; }
-        .h-form button { flex:0 0 auto; padding:12px 24px; background:${BLUE}; color:#fff; font-weight:700; font-size:14px; border:none; border-radius:6px; cursor:pointer; white-space:nowrap; }
-        .h-form button:hover { background:${BLUE_DARK}; }
+        .h-form {
+          display:flex; flex-wrap:wrap; gap:8px; max-width:620px; margin:0 auto;
+          background:#fff; padding:8px; border-radius:10px;
+          box-shadow:0 8px 28px rgba(0,0,0,0.25), 0 0 0 3px rgba(255,153,51,0.35);
+        }
+        .h-form input { flex:1 1 200px; min-width:0; padding:13px 16px; border-radius:6px; border:none; font-size:14px; outline:none; }
+        .h-form button { flex:0 0 auto; padding:13px 26px; background:linear-gradient(135deg, #FF9933, #e07b00); color:#fff; font-weight:700; font-size:14px; border:none; border-radius:6px; cursor:pointer; white-space:nowrap; box-shadow:0 4px 10px rgba(224,123,0,0.35); }
+        .h-form button:hover { background:linear-gradient(135deg, #e07b00, #c66800); }
         .h-tags { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:14px; }
         .h-tags button { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:rgba(255,255,255,0.9); font-size:12px; padding:4px 12px; border-radius:12px; cursor:pointer; }
+        .strip-badge {
+          display:inline-block; background:linear-gradient(90deg, #FF9933 0%, #ffffff 50%, #138808 100%);
+          color:#0a1f44; font-weight:800; font-size:12px; letter-spacing:0.1em; padding:6px 18px;
+          border-radius:20px; margin-bottom:14px; box-shadow:0 4px 14px rgba(0,0,0,0.25);
+        }
         .stats-bar { display:grid; grid-template-columns:repeat(2,1fr); max-width:760px; margin:36px auto 0; background:rgba(255,255,255,0.1); border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.15); }
         @media(min-width:600px){ .stats-bar{ grid-template-columns:repeat(4,1fr); } }
-        .journey { display:grid; grid-template-columns:1fr; gap:12px; }
+        .journey { display:grid; grid-template-columns:1fr; gap:18px; }
         @media(min-width:720px){ .journey{ grid-template-columns:1fr 1fr; } }
-        .cat-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+        .journey-card {
+          position:relative; display:block; text-align:left; cursor:pointer; overflow:hidden;
+          background:linear-gradient(160deg, #ffffff 0%, #f4f8ff 60%, #eaf2ff 100%);
+          border-radius:18px; padding:30px; border:1px solid #d9e6fb;
+          box-shadow:0 10px 30px rgba(10,102,194,0.12), inset 0 1px 0 rgba(255,255,255,0.6);
+          transition:transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .journey-card::after {
+          content:''; position:absolute; inset:0; border-radius:18px; pointer-events:none;
+          background:linear-gradient(135deg, rgba(255,255,255,0.55) 0%, transparent 45%);
+        }
+        .journey-card:hover { transform:translateY(-6px); box-shadow:0 18px 40px rgba(10,102,194,0.22), inset 0 1px 0 rgba(255,255,255,0.6); }
+        .journey-recruiter { background:linear-gradient(160deg, #ffffff 0%, #fff6ec 60%, #ffeed8 100%); border-color:#fbe1bf; box-shadow:0 10px 30px rgba(224,123,0,0.14), inset 0 1px 0 rgba(255,255,255,0.6); }
+        .journey-recruiter:hover { box-shadow:0 18px 40px rgba(224,123,0,0.24), inset 0 1px 0 rgba(255,255,255,0.6); }
+        .cat-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
         @media(min-width:480px){ .cat-grid{ grid-template-columns:repeat(3,1fr); } }
         @media(min-width:768px){ .cat-grid{ grid-template-columns:repeat(4,1fr); } }
-        .jobs-grid { display:grid; grid-template-columns:1fr; gap:10px; }
+        .jobs-grid { display:grid; grid-template-columns:1fr; gap:14px; }
         @media(min-width:640px){ .jobs-grid{ grid-template-columns:repeat(2,1fr); } }
         @media(min-width:1024px){ .jobs-grid{ grid-template-columns:repeat(3,1fr); } }
-        .news-grid { display:grid; grid-template-columns:1fr; gap:12px; }
+        .news-grid { display:grid; grid-template-columns:1fr; gap:14px; }
         @media(min-width:768px){ .news-grid{ grid-template-columns:repeat(3,1fr); } }
-        .events-grid { display:grid; grid-template-columns:1fr; gap:10px; }
+        .events-grid { display:grid; grid-template-columns:1fr; gap:12px; }
         @media(min-width:480px){ .events-grid{ grid-template-columns:repeat(2,1fr); } }
         @media(min-width:1024px){ .events-grid{ grid-template-columns:repeat(4,1fr); } }
-        .cat-card { background:#fff; border-radius:8px; padding:16px 12px; text-align:center; border:1px solid #e0e0e0; display:block; transition:all 0.15s; }
-        .cat-card:hover { border-color:${BLUE}; box-shadow:0 2px 8px rgba(10,102,194,0.12); }
+
+        .cat-card {
+          background:linear-gradient(160deg, #ffffff 0%, #f3f8ff 100%);
+          border-radius:12px; padding:18px 12px; text-align:center; display:block;
+          border:1px solid #dbe8fb; box-shadow:0 4px 14px rgba(10,102,194,0.08);
+          transition:transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        }
+        .cat-card:hover { transform:translateY(-4px); border-color:${BLUE}; box-shadow:0 10px 24px rgba(10,102,194,0.22); }
         .cat-card:hover .cat-name { color:${BLUE} !important; }
-        .job-card { background:#fff; border-radius:8px; border:1px solid #e0e0e0; padding:16px; transition:box-shadow 0.15s; }
-        .job-card:hover { box-shadow:0 2px 10px rgba(0,0,0,0.1); }
+
+        .job-card {
+          background:linear-gradient(160deg, #ffffff 0%, #f6f9ff 100%);
+          border-radius:12px; border:1px solid #dbe8fb; padding:18px;
+          box-shadow:0 4px 14px rgba(10,102,194,0.08);
+          transition:transform 0.18s ease, box-shadow 0.18s ease;
+        }
+        .job-card:hover { transform:translateY(-4px); box-shadow:0 12px 26px rgba(10,102,194,0.2); border-color:${BLUE}; }
+
         .apply-btn { display:inline-block; font-size:13px; font-weight:600; color:${BLUE}; border:1px solid ${BLUE}; padding:5px 16px; border-radius:16px; transition:all 0.15s; }
         .apply-btn:hover { background:${BLUE}; color:#fff; }
         .section-divider { border:none; border-top:1px solid #e0e0e0; margin:0; }
+
+        .news-card {
+          background:linear-gradient(160deg, #ffffff 0%, #f6f9ff 100%);
+          border-radius:12px; border:1px solid #dbe8fb; overflow:hidden;
+          box-shadow:0 4px 14px rgba(10,102,194,0.08);
+          transition:transform 0.18s ease, box-shadow 0.18s ease;
+        }
+        .news-card:hover { transform:translateY(-4px); box-shadow:0 12px 26px rgba(10,102,194,0.2); }
+
+        .event-card {
+          background:linear-gradient(160deg, #ffffff 0%, #f6f9ff 100%);
+          border-radius:12px; border:1px solid #dbe8fb; padding:16px;
+          box-shadow:0 4px 14px rgba(10,102,194,0.08);
+          transition:transform 0.18s ease, box-shadow 0.18s ease;
+        }
+        .event-card:hover { transform:translateY(-4px); box-shadow:0 12px 26px rgba(10,102,194,0.2); }
       `}</style>
 
       {/* HERO */}
       <section style={{ background:'linear-gradient(135deg, #062b56 0%, #0a4a8c 60%, #0f5fb5 100%)', padding:'52px 16px 44px', textAlign:'center' }}>
         <div style={{ maxWidth:W, margin:'0 auto' }}>
-          <p style={{ color:'rgba(255,255,255,0.6)', fontSize:'12px', fontWeight:500, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'14px' }}>
-            India's Premier Professional Network
-          </p>
-          <h1 style={{ fontSize:'clamp(1.7rem, 4vw, 2.6rem)', fontWeight:700, color:'white', lineHeight:1.2, marginBottom:'10px' }}>
-            Find Your Next Career Opportunity
+          <span className="strip-badge">STAFFING AND CAREER SOLUTIONS</span>
+          <h1 style={{ fontSize:'clamp(1.5rem, 3.4vw, 2.1rem)', fontWeight:700, color:'white', lineHeight:1.3, marginBottom:'24px' }}>
+            Connecting Professionals to the Right Opportunities
           </h1>
-          <p style={{ color:'rgba(255,255,255,0.7)', fontSize:'clamp(14px,2vw,16px)', maxWidth:'520px', margin:'0 auto 24px', lineHeight:1.6 }}>
-            Connecting top talent with leading employers across India. Thousands of opportunities, one platform.
-          </p>
           <form onSubmit={handleSearch} className="h-form">
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Job title, company, or keyword..." />
             <button type="submit">Search Jobs</button>
@@ -106,28 +157,28 @@ export default function Home() {
       </section>
 
       {/* JOURNEY CTA */}
-      <section style={{ maxWidth:W, margin:'0 auto', padding:'20px 16px' }}>
+      <section style={{ maxWidth:W, margin:'0 auto', padding:'28px 16px' }}>
         <div className="journey">
-          <div style={{ background:'#fff', borderRadius:'8px', padding:'22px', border:'1px solid #e0e0e0', display:'flex', flexDirection:'column', gap:'10px' }}>
-            <div style={{ display:'flex', alignItems:'center', gap:'10px' }}>
-              <span style={{ fontSize:'1.5rem' }}>🔍</span>
-              <h2 style={{ fontWeight:700, fontSize:'17px', color:'#1a1a1a' }}>I'm a Job Seeker</h2>
+          <div className="journey-card" onClick={() => navigate('/jobs')} role="button" tabIndex={0}>
+            <div style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'10px' }}>
+              <span style={{ fontSize:'1.8rem' }}>🔍</span>
+              <h2 style={{ fontWeight:700, fontSize:'19px', color:'#1a1a1a' }}>I'm a Job Seeker</h2>
             </div>
-            <p style={{ color:'#555', fontSize:'14px', lineHeight:1.6 }}>Build your profile, discover thousands of opportunities, and track every application in one place.</p>
-            <div style={{ display:'flex', gap:'10px', flexWrap:'wrap' }}>
-              <Link to="/register?role=seeker" style={{ background:BLUE, color:'#fff', fontWeight:600, fontSize:'13px', padding:'8px 18px', borderRadius:'16px' }}>Create Profile</Link>
-              <Link to="/jobs" style={{ color:BLUE, fontSize:'13px', fontWeight:500, padding:'8px 18px', border:`1px solid ${BLUE}`, borderRadius:'16px' }}>Browse Jobs</Link>
+            <p style={{ color:'#555', fontSize:'14px', lineHeight:1.6, marginBottom:'16px' }}>Build your profile, discover thousands of opportunities, and track every application in one place.</p>
+            <div style={{ display:'flex', gap:'10px', flexWrap:'wrap', position:'relative', zIndex:1 }}>
+              <Link to="/register?role=seeker" onClick={e=>e.stopPropagation()} style={{ background:BLUE, color:'#fff', fontWeight:600, fontSize:'13px', padding:'9px 20px', borderRadius:'18px' }}>Create Profile</Link>
+              <Link to="/jobs" onClick={e=>e.stopPropagation()} style={{ color:BLUE, fontSize:'13px', fontWeight:500, padding:'9px 20px', border:`1px solid ${BLUE}`, borderRadius:'18px' }}>Browse Jobs</Link>
             </div>
           </div>
-          <div style={{ background:'#fff', borderRadius:'8px', padding:'22px', border:'1px solid #e0e0e0', display:'flex', flexDirection:'column', gap:'10px' }}>
-            <div style={{ display:'flex', alignItems:'center', gap:'10px' }}>
-              <span style={{ fontSize:'1.5rem' }}>🏢</span>
-              <h2 style={{ fontWeight:700, fontSize:'17px', color:'#1a1a1a' }}>I'm an Employer</h2>
+          <div className="journey-card journey-recruiter" onClick={() => navigate('/register?role=recruiter')} role="button" tabIndex={0}>
+            <div style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'10px' }}>
+              <span style={{ fontSize:'1.8rem' }}>🏢</span>
+              <h2 style={{ fontWeight:700, fontSize:'19px', color:'#1a1a1a' }}>I'm an Employer</h2>
             </div>
-            <p style={{ color:'#555', fontSize:'14px', lineHeight:1.6 }}>Post vacancies, review matched candidates, and manage your hiring pipeline with ease.</p>
-            <div style={{ display:'flex', gap:'10px', flexWrap:'wrap' }}>
-              <Link to="/register?role=recruiter" style={{ background:BLUE, color:'#fff', fontWeight:600, fontSize:'13px', padding:'8px 18px', borderRadius:'16px' }}>Post a Job</Link>
-              <Link to="/login" style={{ color:BLUE, fontSize:'13px', fontWeight:500, padding:'8px 18px', border:`1px solid ${BLUE}`, borderRadius:'16px' }}>Sign In</Link>
+            <p style={{ color:'#555', fontSize:'14px', lineHeight:1.6, marginBottom:'16px' }}>Post vacancies, review matched candidates, and manage your hiring pipeline with ease.</p>
+            <div style={{ display:'flex', gap:'10px', flexWrap:'wrap', position:'relative', zIndex:1 }}>
+              <Link to="/register?role=recruiter" onClick={e=>e.stopPropagation()} style={{ background:'#e07b00', color:'#fff', fontWeight:600, fontSize:'13px', padding:'9px 20px', borderRadius:'18px' }}>Post a Job</Link>
+              <Link to="/login" onClick={e=>e.stopPropagation()} style={{ color:'#e07b00', fontSize:'13px', fontWeight:500, padding:'9px 20px', border:'1px solid #e07b00', borderRadius:'18px' }}>Sign In</Link>
             </div>
           </div>
         </div>
@@ -154,10 +205,10 @@ export default function Home() {
 
       <hr className="section-divider" />
 
-      {/* FEATURED JOBS */}
+      {/* CURRENT ENQUIRIES */}
       <section style={{ maxWidth:W, margin:'0 auto', padding:'28px 16px' }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'14px' }}>
-          <h2 style={{ fontWeight:700, fontSize:'17px', color:'#1a1a1a' }}>Featured Vacancies</h2>
+          <h2 style={{ fontWeight:700, fontSize:'17px', color:'#1a1a1a' }}>Current Enquiries</h2>
           <Link to="/jobs" style={{ color:BLUE, fontSize:'13px', fontWeight:600 }}>View All →</Link>
         </div>
         {jobs.length === 0 ? (
@@ -197,7 +248,7 @@ export default function Home() {
               <h2 style={{ fontWeight:700, fontSize:'17px', color:'#1a1a1a', marginBottom:'16px' }}>News & Insights</h2>
               <div className="news-grid">
                 {news.map(n => (
-                  <div key={n.id} style={{ background:'#f9f9f9', borderRadius:'8px', border:'1px solid #e0e0e0', overflow:'hidden' }}>
+                  <div key={n.id} className="news-card">
                     <div style={{ height:'3px', background:BLUE }} />
                     <div style={{ padding:'16px' }}>
                       <span style={{ fontSize:'11px', background:'#e8f1fb', color:BLUE, padding:'2px 8px', borderRadius:'10px', fontWeight:500 }}>{n.category}</span>
@@ -220,7 +271,7 @@ export default function Home() {
             <h2 style={{ fontWeight:700, fontSize:'17px', color:'#1a1a1a', marginBottom:'14px' }}>Upcoming Events</h2>
             <div className="events-grid">
               {events.map(ev => (
-                <div key={ev.id} style={{ background:'#fff', borderRadius:'8px', borderLeft:`3px solid ${BLUE}`, border:`1px solid #e0e0e0`, borderLeftWidth:'3px', padding:'16px' }}>
+                <div key={ev.id} className="event-card" style={{ borderLeft:`3px solid ${BLUE}` }}>
                   <div style={{ fontSize:'1.2rem', marginBottom:'6px' }}>{ev.isOnline ? '🌐' : '📍'}</div>
                   <h3 style={{ fontWeight:600, color:'#1a1a1a', fontSize:'14px', lineHeight:1.4 }}>{ev.title}</h3>
                   <p style={{ color:'#666', fontSize:'12px', marginTop:'4px' }}>{new Date(ev.eventDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</p>
@@ -233,18 +284,6 @@ export default function Home() {
           </section>
         </>
       )}
-
-      {/* FINAL CTA */}
-      <section style={{ background:'#f0f7ff', borderTop:'1px solid #c8e0f9', padding:'40px 16px', textAlign:'center' }}>
-        <h2 style={{ fontWeight:700, fontSize:'clamp(1.2rem,3vw,1.6rem)', color:'#1a1a1a', marginBottom:'8px' }}>Ready to Take the Next Step?</h2>
-        <p style={{ color:'#555', marginBottom:'20px', maxWidth:'440px', margin:'0 auto 20px', fontSize:'14px', lineHeight:1.6 }}>
-          Join thousands of professionals already using IIPA Job Forum to advance their careers across India.
-        </p>
-        <div style={{ display:'flex', justifyContent:'center', gap:'12px', flexWrap:'wrap' }}>
-          <Link to="/register" style={{ background:BLUE, color:'#fff', fontWeight:700, fontSize:'14px', padding:'10px 28px', borderRadius:'20px' }}>Create Free Account</Link>
-          <Link to="/jobs" style={{ color:BLUE, fontSize:'14px', fontWeight:600, padding:'10px 28px', border:`1px solid ${BLUE}`, borderRadius:'20px' }}>Browse Jobs</Link>
-        </div>
-      </section>
     </div>
   );
 }

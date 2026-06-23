@@ -17,9 +17,14 @@ export default function Navbar() {
       <div style={{ maxWidth:'1128px', margin:'0 auto', padding:'0 16px', display:'flex', alignItems:'center', justifyContent:'space-between', height:'52px' }}>
 
         {/* Logo */}
-        <Link to="/" onClick={() => setOpen(false)} style={{ display:'flex', alignItems:'center', gap:'6px' }}>
-          <span style={{ color:'#FF9933', fontWeight:700, fontSize:'18px' }}>IIPA</span>
-          <span style={{ color:'white', fontWeight:600, fontSize:'16px' }}>Job Forum</span>
+        <Link to="/" onClick={() => setOpen(false)} style={{ display:'flex', alignItems:'baseline', gap:'8px' }}>
+          <span style={{ display:'flex', alignItems:'baseline', gap:'6px' }}>
+            <span style={{ color:'#FF9933', fontWeight:700, fontSize:'18px' }}>IIPA</span>
+            <span style={{ color:'white', fontWeight:600, fontSize:'16px' }}>JOBS</span>
+          </span>
+          <span className="brand-tagline" style={{ color:'rgba(255,255,255,0.55)', fontSize:'11px', fontWeight:500 }}>
+            Connecting Talents with Opportunities
+          </span>
         </Link>
 
         {/* Desktop nav */}
@@ -102,6 +107,9 @@ export default function Navbar() {
       <style>{`
         .desk-nav { display: flex; }
         .mob-menu { display: none; }
+        @media (max-width: 900px) {
+          .brand-tagline { display: none !important; }
+        }
         @media (max-width: 767px) {
           .desk-nav { display: none !important; }
           .mob-menu { display: flex !important; }
