@@ -40,7 +40,6 @@ export default function Footer() {
               </span>
             </span>
           </div>
-          <p style={{ fontSize:'13px', lineHeight:1.6, marginTop:'10px' }}>Your trusted career partner — connecting professionals with leading employers across India.</p>
         </div>
         <div>
           <h4 style={{ color:'white', fontWeight:600, fontSize:'14px', marginBottom:'12px' }}>For Job Seekers</h4>
