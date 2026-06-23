@@ -19,10 +19,14 @@ import RecruiterDashboard from './pages/recruiter/Dashboard';
 import PostJob            from './pages/recruiter/PostJob';
 import Applicants         from './pages/recruiter/Applicants';
 
+import AdminPanel       from './pages/admin/AdminPanel';
+import CoordinatorPanel from './pages/coordinator/CoordinatorPanel';
+
 function ProtectedRoute({ children, role }) {
   const { user } = useAuth();
-  if (!user)             return <Navigate to="/login" replace />;
-  if (role && user.role !== role) return <Navigate to="/" replace />;
+  if (!user) return <Navigate to="/login" replace />;
+  const allowed = Array.isArray(role) ? role : role ? [role] : null;
+  if (allowed && !allowed.includes(user.role)) return <Navigate to="/" replace />;
   return children;
 }
 
@@ -55,6 +59,13 @@ function AppRoutes() {
           } />
           <Route path="/recruiter/applicants/:jobId" element={
             <ProtectedRoute role="recruiter"><Applicants /></ProtectedRoute>
+          } />
+
+          <Route path="/admin/dashboard" element={
+            <ProtectedRoute role="admin"><AdminPanel /></ProtectedRoute>
+          } />
+          <Route path="/coordinator/dashboard" element={
+            <ProtectedRoute role="coordinator"><CoordinatorPanel /></ProtectedRoute>
           } />
 
           <Route path="*" element={<Navigate to="/" replace />} />

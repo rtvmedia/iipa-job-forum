@@ -4,6 +4,12 @@ import { useAuth } from '../context/AuthContext';
 
 const F = "inherit";
 
+const dashboardPath = (role) => ({
+  recruiter:   '/recruiter/dashboard',
+  admin:       '/admin/dashboard',
+  coordinator: '/coordinator/dashboard',
+}[role] || '/seeker/dashboard');
+
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -38,7 +44,7 @@ export default function Navbar() {
         <div style={{ display:'flex', alignItems:'center', gap:'12px' }} className="desk-nav">
           {user ? (
             <>
-              <Link to={user.role==='recruiter' ? '/recruiter/dashboard' : '/seeker/dashboard'}
+              <Link to={dashboardPath(user.role)}
                 style={{ color:'rgba(255,255,255,0.85)', fontSize:'14px', maxWidth:'140px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
                 {user.fullName}
               </Link>
@@ -67,42 +73,48 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile menu */}
-      {open && (
-        <div style={{ background:'#1a237e', borderTop:'1px solid rgba(255,255,255,0.1)', padding:'12px 16px 16px', display:'flex', flexDirection:'column', gap:'4px' }}>
+      {/* Mobile drawer backdrop */}
+      <div className={`mob-backdrop ${open ? 'mob-backdrop-open' : ''}`} onClick={() => setOpen(false)} />
+
+      {/* Mobile drawer */}
+      <div className={`mob-drawer ${open ? 'mob-drawer-open' : ''}`}>
+        <div style={{ display:'flex', justifyContent:'flex-end', padding:'12px 16px 0' }}>
+          <button onClick={() => setOpen(false)} style={{ background:'none', border:'none', color:'white', fontSize:'22px', lineHeight:1, padding:'4px 8px', cursor:'pointer' }}>×</button>
+        </div>
+        <div style={{ padding:'4px 20px 24px', display:'flex', flexDirection:'column', gap:'4px' }}>
           {[['Find Jobs','/jobs'],['About','/about'],['Contact','/contact']].map(([label,path]) => (
             <Link key={path} to={path} onClick={() => setOpen(false)}
-              style={{ color:'rgba(255,255,255,0.85)', fontSize:'15px', padding:'8px 0', borderBottom:'1px solid rgba(255,255,255,0.07)' }}>
+              style={{ color:'rgba(255,255,255,0.85)', fontSize:'16px', padding:'12px 0', borderBottom:'1px solid rgba(255,255,255,0.1)' }}>
               {label}
             </Link>
           ))}
-          <div style={{ paddingTop:'12px', display:'flex', flexDirection:'column', gap:'8px' }}>
+          <div style={{ paddingTop:'16px', display:'flex', flexDirection:'column', gap:'10px' }}>
             {user ? (
               <>
-                <Link to={user.role==='recruiter' ? '/recruiter/dashboard' : '/seeker/dashboard'} onClick={() => setOpen(false)}
+                <Link to={dashboardPath(user.role)} onClick={() => setOpen(false)}
                   style={{ color:'rgba(255,255,255,0.85)', fontSize:'15px' }}>
                   {user.fullName}
                 </Link>
                 <button onClick={handleLogout}
-                  style={{ background:'#FF9933', color:'#1a237e', fontWeight:600, fontSize:'14px', padding:'10px', borderRadius:'8px', border:'none', textAlign:'center' }}>
+                  style={{ background:'#FF9933', color:'#1a237e', fontWeight:600, fontSize:'14px', padding:'12px', borderRadius:'8px', border:'none', textAlign:'center' }}>
                   Logout
                 </button>
               </>
             ) : (
               <>
                 <Link to="/login" onClick={() => setOpen(false)}
-                  style={{ color:'rgba(255,255,255,0.85)', fontSize:'15px', textAlign:'center', padding:'10px', border:'1px solid rgba(255,255,255,0.3)', borderRadius:'8px' }}>
+                  style={{ color:'rgba(255,255,255,0.85)', fontSize:'15px', textAlign:'center', padding:'12px', border:'1px solid rgba(255,255,255,0.3)', borderRadius:'8px' }}>
                   Sign In
                 </Link>
                 <Link to="/register" onClick={() => setOpen(false)}
-                  style={{ background:'#FF9933', color:'#1a237e', fontWeight:600, fontSize:'14px', padding:'10px', borderRadius:'8px', textAlign:'center' }}>
+                  style={{ background:'#FF9933', color:'#1a237e', fontWeight:600, fontSize:'14px', padding:'12px', borderRadius:'8px', textAlign:'center' }}>
                   Get Started
                 </Link>
               </>
             )}
           </div>
         </div>
-      )}
+      </div>
 
       <style>{`
         .desk-nav { display: flex; }
@@ -114,6 +126,18 @@ export default function Navbar() {
           .desk-nav { display: none !important; }
           .mob-menu { display: flex !important; }
         }
+        .mob-backdrop {
+          position: fixed; inset: 0; background: rgba(0,0,0,0); pointer-events: none;
+          transition: background 0.25s ease; z-index: 60;
+        }
+        .mob-backdrop-open { background: rgba(0,0,0,0.45); pointer-events: auto; }
+        .mob-drawer {
+          position: fixed; top: 0; right: 0; height: 100vh; width: min(78vw, 300px);
+          background: #1a237e; box-shadow: -8px 0 24px rgba(0,0,0,0.3);
+          transform: translateX(100%); transition: transform 0.28s ease; z-index: 61;
+          overflow-y: auto;
+        }
+        .mob-drawer-open { transform: translateX(0); }
       `}</style>
     </nav>
   );
