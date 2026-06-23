@@ -1,12 +1,21 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import api from '../api/axios';
 
 export default function Footer() {
+  const [logoUrl, setLogoUrl] = useState(null);
+
+  useEffect(() => {
+    api.get('/settings').then(r => setLogoUrl(r.data?.footerLogoUrl || null)).catch(() => {});
+  }, []);
+
   return (
     <footer style={{ background:'#1a237e', color:'rgba(255,255,255,0.75)', marginTop:'auto' }}>
       <div className="tricolor" />
       <div style={{ maxWidth:'1128px', margin:'0 auto', padding:'40px 16px 24px', display:'grid', gap:'32px', gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))' }}>
         <div>
           <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'4px' }}>
+            {logoUrl && <img src={logoUrl} alt="Logo" style={{ height:'26px', width:'auto', marginRight:'2px' }} />}
             <span style={{ color:'#FF9933', fontWeight:700, fontSize:'18px' }}>IIPA</span>
             <span style={{ color:'white', fontWeight:600, fontSize:'15px' }}>JOBS</span>
           </div>

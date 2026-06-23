@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import api from '../api/axios';
 
 const F = "inherit";
 
@@ -14,6 +15,11 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [logoUrl, setLogoUrl] = useState(null);
+
+  useEffect(() => {
+    api.get('/settings').then(r => setLogoUrl(r.data?.headerLogoUrl || null)).catch(() => {});
+  }, []);
 
   const handleLogout = () => { logout(); navigate('/'); setOpen(false); };
 
@@ -24,6 +30,7 @@ export default function Navbar() {
 
         {/* Logo */}
         <Link to="/" onClick={() => setOpen(false)} style={{ display:'flex', alignItems:'baseline', gap:'8px' }}>
+          {logoUrl && <img src={logoUrl} alt="Logo" style={{ height:'30px', width:'auto', marginRight:'2px' }} />}
           <span style={{ display:'flex', alignItems:'baseline', gap:'6px' }}>
             <span style={{ color:'#FF9933', fontWeight:700, fontSize:'18px' }}>IIPA</span>
             <span style={{ color:'white', fontWeight:600, fontSize:'16px' }}>JOBS</span>

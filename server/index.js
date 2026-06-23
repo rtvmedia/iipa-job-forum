@@ -19,6 +19,7 @@ console.log('ENV CHECK:', {
 
 app.use(cors({ origin: '*', credentials: false }));
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // API routes
 app.use('/api/auth',         require('./routes/auth'));
@@ -26,6 +27,9 @@ app.use('/api/jobs',         require('./routes/jobs'));
 app.use('/api/applications', require('./routes/applications'));
 app.use('/api/news',         require('./routes/news'));
 app.use('/api/events',       require('./routes/events'));
+app.use('/api/admin',        require('./routes/admin'));
+app.use('/api/coordinator',  require('./routes/coordinator'));
+app.use('/api/settings',     require('./routes/settings'));
 
 app.get('/api/health', (_, res) => res.json({
   status: 'ok',

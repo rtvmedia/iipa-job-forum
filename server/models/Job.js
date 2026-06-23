@@ -15,6 +15,8 @@ const Job = sequelize.define('Job', {
   salaryMax:    { type: DataTypes.INTEGER },
   deadline:     { type: DataTypes.DATEONLY },
   isActive:     { type: DataTypes.BOOLEAN, defaultValue: true },
+  coordinatorId:   { type: DataTypes.INTEGER, allowNull: true },
+  approvalStatus:  { type: DataTypes.ENUM('approved', 'pending', 'rejected'), defaultValue: 'approved' },
 }, { tableName: 'jobs', timestamps: true });
 
 module.exports = Job;

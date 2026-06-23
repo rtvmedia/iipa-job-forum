@@ -1,8 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import api from '../../api/axios';
+import { exportToExcel } from '../../utils/exportCsv';
 
 const TEAL  = '#0d9488';
 const GOLD  = '#d97706';
+const GREEN = '#16a34a';
+const RED   = '#dc2626';
 
 const TABS = [
   { key:'overview', label:'Dashboard',        icon:'📊' },
@@ -10,17 +14,11 @@ const TABS = [
   { key:'mine',     label:'My Submissions',   icon:'📋' },
 ];
 
-const MOCK_SUBMISSIONS = [
-  { title:'Senior React Developer', type:'Job Posting', status:'pending',  date:'21 Jun 2026' },
-  { title:'HR Business Partner',    type:'Job Posting', status:'approved', date:'18 Jun 2026' },
-  { title:'Data Analyst Intern',    type:'Job Posting', status:'rejected', date:'14 Jun 2026' },
-];
-
 function StatusPill({ status }) {
   const map = {
-    approved: { bg:'#e8f5e9', color:'#16a34a' },
+    approved: { bg:'#e8f5e9', color:GREEN },
     pending:  { bg:'#fff8e1', color:GOLD },
-    rejected: { bg:'#fce8e8', color:'#dc2626' },
+    rejected: { bg:'#fce8e8', color:RED },
   };
   const s = map[status] || map.pending;
   return <span style={{ background:s.bg, color:s.color, fontSize:'11.5px', fontWeight:700, padding:'3px 12px', borderRadius:'12px', textTransform:'capitalize' }}>{status}</span>;
@@ -31,13 +29,30 @@ export default function CoordinatorPanel() {
   const [tab, setTab] = useState('overview');
   const [form, setForm] = useState({ title:'', company:'', location:'', description:'' });
   const [submitted, setSubmitted] = useState(false);
+  const [mine, setMine] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = e => {
+  const loadMine = useCallback(async () => {
+    setLoading(true);
+    try { const { data } = await api.get('/coordinator/jobs/mine'); setMine(data); }
+    catch (e) { console.error(e); }
+    finally { setLoading(false); }
+  }, []);
+
+  useEffect(() => { loadMine(); }, [loadMine]);
+
+  const handleSubmit = async e => {
     e.preventDefault();
+    await api.post('/coordinator/jobs', form);
     setSubmitted(true);
     setForm({ title:'', company:'', location:'', description:'' });
+    loadMine();
     setTimeout(() => setSubmitted(false), 3500);
   };
+
+  const totalSubmitted = mine.length;
+  const totalApproved   = mine.filter(j => j.approvalStatus === 'approved').length;
+  const totalPending     = mine.filter(j => j.approvalStatus === 'pending').length;
 
   return (
     <div style={{ background:'#f4faf9', minHeight:'calc(100vh - 52px)' }}>
@@ -75,18 +90,24 @@ export default function CoordinatorPanel() {
         <main style={{ padding:'20px 18px 40px' }}>
           {tab === 'overview' && (
             <>
-              <h2 style={{ fontWeight:700, fontSize:'17px', color:'#1a1a1a', marginBottom:'14px' }}>Your Activity</h2>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'14px' }}>
+                <h2 style={{ fontWeight:700, fontSize:'17px', color:'#1a1a1a' }}>Your Activity</h2>
+                <button onClick={() => exportToExcel('my-activity', [{ TotalSubmitted:totalSubmitted, Approved:totalApproved, Pending:totalPending }])}
+                  style={{ background:'#fff', color:GREEN, border:`1px solid ${GREEN}`, fontWeight:600, fontSize:'12.5px', padding:'7px 16px', borderRadius:'14px', cursor:'pointer' }}>
+                  ⬇ Export to Excel
+                </button>
+              </div>
               <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'14px' }}>
                 <div className="coord-card" style={{ padding:'18px', textAlign:'center' }}>
-                  <div style={{ color:TEAL, fontWeight:800, fontSize:'1.7rem' }}>14</div>
+                  <div style={{ color:TEAL, fontWeight:800, fontSize:'1.7rem' }}>{totalSubmitted}</div>
                   <div style={{ color:'#555', fontSize:'12.5px', marginTop:'4px' }}>Total Submitted</div>
                 </div>
                 <div className="coord-card" style={{ padding:'18px', textAlign:'center' }}>
-                  <div style={{ color:'#16a34a', fontWeight:800, fontSize:'1.7rem' }}>11</div>
+                  <div style={{ color:GREEN, fontWeight:800, fontSize:'1.7rem' }}>{totalApproved}</div>
                   <div style={{ color:'#555', fontSize:'12.5px', marginTop:'4px' }}>Approved</div>
                 </div>
                 <div className="coord-card" style={{ padding:'18px', textAlign:'center' }}>
-                  <div style={{ color:GOLD, fontWeight:800, fontSize:'1.7rem' }}>2</div>
+                  <div style={{ color:GOLD, fontWeight:800, fontSize:'1.7rem' }}>{totalPending}</div>
                   <div style={{ color:'#555', fontSize:'12.5px', marginTop:'4px' }}>Awaiting Approval</div>
                 </div>
               </div>
@@ -101,7 +122,7 @@ export default function CoordinatorPanel() {
               <h2 style={{ fontWeight:700, fontSize:'17px', color:'#1a1a1a', marginBottom:'4px' }}>Submit a Job Enquiry</h2>
               <p style={{ color:'#666', fontSize:'13px', marginBottom:'16px' }}>This will be sent to Admin for approval before publishing.</p>
               {submitted && (
-                <div style={{ background:'#e8f5e9', color:'#16a34a', padding:'10px 16px', borderRadius:'8px', fontSize:'13px', marginBottom:'14px' }}>
+                <div style={{ background:'#e8f5e9', color:GREEN, padding:'10px 16px', borderRadius:'8px', fontSize:'13px', marginBottom:'14px' }}>
                   ✅ Submitted for admin approval.
                 </div>
               )}
@@ -122,7 +143,7 @@ export default function CoordinatorPanel() {
                 </div>
                 <div>
                   <label style={{ display:'block', fontSize:'13px', fontWeight:500, color:'#333', marginBottom:'5px' }}>Description</label>
-                  <textarea className="coord-input" rows={4} style={{ resize:'none' }} value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} placeholder="Role details, requirements..." />
+                  <textarea className="coord-input" rows={4} style={{ resize:'none' }} value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} placeholder="Role details, requirements..." required />
                 </div>
                 <button type="submit" style={{ background:TEAL, color:'#fff', fontWeight:600, fontSize:'14px', padding:'12px', borderRadius:'8px', border:'none', cursor:'pointer' }}>
                   Submit for Approval
@@ -133,15 +154,25 @@ export default function CoordinatorPanel() {
 
           {tab === 'mine' && (
             <>
-              <h2 style={{ fontWeight:700, fontSize:'17px', color:'#1a1a1a', marginBottom:'14px' }}>My Submissions</h2>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'14px' }}>
+                <h2 style={{ fontWeight:700, fontSize:'17px', color:'#1a1a1a' }}>My Submissions</h2>
+                <button onClick={() => exportToExcel('my-submissions', mine.map(s => ({ Title:s.title, Company:s.company, Status:s.approvalStatus, Date:s.createdAt })))}
+                  style={{ background:'#fff', color:GREEN, border:`1px solid ${GREEN}`, fontWeight:600, fontSize:'12.5px', padding:'7px 16px', borderRadius:'14px', cursor:'pointer' }}>
+                  ⬇ Export to Excel
+                </button>
+              </div>
               <div className="coord-card" style={{ overflow:'hidden' }}>
-                {MOCK_SUBMISSIONS.map((s, i) => (
-                  <div key={i} style={{ display:'flex', justifyContent:'space-between', gap:'12px', padding:'14px 18px', borderBottom: i < MOCK_SUBMISSIONS.length-1 ? '1px solid #eef7f5' : 'none' }}>
+                {loading ? (
+                  <p style={{ padding:'18px', color:'#888', fontSize:'13px' }}>Loading...</p>
+                ) : mine.length === 0 ? (
+                  <p style={{ padding:'18px', color:'#888', fontSize:'13px' }}>You haven't submitted anything yet.</p>
+                ) : mine.map((s, i) => (
+                  <div key={s.id} style={{ display:'flex', justifyContent:'space-between', gap:'12px', padding:'14px 18px', borderBottom: i < mine.length-1 ? '1px solid #eef7f5' : 'none' }}>
                     <div>
                       <p style={{ fontWeight:600, color:'#1a1a1a', fontSize:'14px' }}>{s.title}</p>
-                      <p style={{ color:'#777', fontSize:'12.5px', marginTop:'2px' }}>{s.type} · {s.date}</p>
+                      <p style={{ color:'#777', fontSize:'12.5px', marginTop:'2px' }}>{s.company} · {new Date(s.createdAt).toLocaleDateString('en-IN')}</p>
                     </div>
-                    <StatusPill status={s.status} />
+                    <StatusPill status={s.approvalStatus} />
                   </div>
                 ))}
               </div>

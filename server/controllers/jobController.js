@@ -4,7 +4,7 @@ const { Op } = require('sequelize');
 const getAllJobs = async (req, res) => {
   try {
     const { search, category, type, location } = req.query;
-    const where = { isActive: true };
+    const where = { isActive: true, approvalStatus: 'approved' };
     if (search)   where.title       = { [Op.like]: `%${search}%` };
     if (category) where.category    = category;
     if (type)     where.type        = type;
