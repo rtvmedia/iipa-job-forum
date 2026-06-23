@@ -63,22 +63,16 @@ export default function Home() {
         }
         .stats-bar { display:grid; grid-template-columns:repeat(2,1fr); max-width:760px; margin:36px auto 0; background:rgba(255,255,255,0.1); border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.15); }
         @media(min-width:600px){ .stats-bar{ grid-template-columns:repeat(4,1fr); } }
-        .journey { display:grid; grid-template-columns:1fr; gap:18px; }
-        @media(min-width:720px){ .journey{ grid-template-columns:1fr 1fr; } }
-        .journey-card {
-          position:relative; display:block; text-align:left; cursor:pointer; overflow:hidden;
-          background:linear-gradient(160deg, #ffffff 0%, #f4f8ff 60%, #eaf2ff 100%);
-          border-radius:18px; padding:30px; border:1px solid #d9e6fb;
-          box-shadow:0 10px 30px rgba(10,102,194,0.12), inset 0 1px 0 rgba(255,255,255,0.6);
-          transition:transform 0.2s ease, box-shadow 0.2s ease;
+        .hero-layout { display:grid; grid-template-columns:1fr; gap:20px; align-items:stretch; }
+        @media(min-width:920px){ .hero-layout{ grid-template-columns:230px 1fr 230px; } }
+        .hero-side-card {
+          position:relative; display:flex; flex-direction:column; text-align:left; cursor:pointer;
+          background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.22);
+          border-radius:18px; padding:22px; backdrop-filter:blur(6px);
+          transition:transform 0.2s ease, background 0.2s ease;
         }
-        .journey-card::after {
-          content:''; position:absolute; inset:0; border-radius:18px; pointer-events:none;
-          background:linear-gradient(135deg, rgba(255,255,255,0.55) 0%, transparent 45%);
-        }
-        .journey-card:hover { transform:translateY(-6px); box-shadow:0 18px 40px rgba(10,102,194,0.22), inset 0 1px 0 rgba(255,255,255,0.6); }
-        .journey-recruiter { background:linear-gradient(160deg, #ffffff 0%, #fff6ec 60%, #ffeed8 100%); border-color:#fbe1bf; box-shadow:0 10px 30px rgba(224,123,0,0.14), inset 0 1px 0 rgba(255,255,255,0.6); }
-        .journey-recruiter:hover { box-shadow:0 18px 40px rgba(224,123,0,0.24), inset 0 1px 0 rgba(255,255,255,0.6); }
+        .hero-side-card:hover { transform:translateY(-5px); background:rgba(255,255,255,0.16); }
+        .hero-side-card.employer { border-color:rgba(255,153,51,0.4); }
         .cat-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
         @media(min-width:480px){ .cat-grid{ grid-template-columns:repeat(3,1fr); } }
         @media(min-width:768px){ .cat-grid{ grid-template-columns:repeat(4,1fr); } }
@@ -130,56 +124,57 @@ export default function Home() {
       `}</style>
 
       {/* HERO */}
-      <section style={{ background:'linear-gradient(135deg, #062b56 0%, #0a4a8c 60%, #0f5fb5 100%)', padding:'52px 16px 44px', textAlign:'center' }}>
+      <section style={{ background:'linear-gradient(135deg, #062b56 0%, #0a4a8c 60%, #0f5fb5 100%)', padding:'44px 16px 44px' }}>
         <div style={{ maxWidth:W, margin:'0 auto' }}>
-          <span className="strip-badge">STAFFING AND CAREER SOLUTIONS</span>
-          <h1 style={{ fontSize:'clamp(1.5rem, 3.4vw, 2.1rem)', fontWeight:700, color:'white', lineHeight:1.3, marginBottom:'24px' }}>
-            Connecting Professionals to the Right Opportunities
-          </h1>
-          <form onSubmit={handleSearch} className="h-form">
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Job title, company, or keyword..." />
-            <button type="submit">Search Jobs</button>
-          </form>
-          <div className="h-tags">
-            {['React Developer','HR Manager','Data Analyst','Marketing Lead','Node.js'].map(t => (
-              <button key={t} onClick={() => navigate(`/jobs?search=${t}`)}>{t}</button>
-            ))}
-          </div>
-        </div>
-        <div className="stats-bar">
-          {STATS.map(s => (
-            <div key={s.label} style={{ padding:'16px 12px', textAlign:'center' }}>
-              <div style={{ color:'#fff', fontWeight:700, fontSize:'1.3rem' }}>{s.value}</div>
-              <div style={{ color:'rgba(255,255,255,0.55)', fontSize:'12px', marginTop:'2px' }}>{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
+          <div className="hero-layout">
 
-      {/* JOURNEY CTA */}
-      <section style={{ maxWidth:W, margin:'0 auto', padding:'28px 16px' }}>
-        <div className="journey">
-          <div className="journey-card" onClick={() => navigate('/jobs')} role="button" tabIndex={0}>
-            <div style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'10px' }}>
-              <span style={{ fontSize:'1.8rem' }}>🔍</span>
-              <h2 style={{ fontWeight:700, fontSize:'19px', color:'#1a1a1a' }}>I'm a Job Seeker</h2>
+            {/* Job Seeker card */}
+            <div className="hero-side-card" onClick={() => navigate('/jobs')} role="button" tabIndex={0}>
+              <span style={{ fontSize:'1.7rem', marginBottom:'8px' }}>🔍</span>
+              <h2 style={{ fontWeight:700, fontSize:'16px', color:'#fff', marginBottom:'6px' }}>I'm a Job Seeker</h2>
+              <p style={{ color:'rgba(255,255,255,0.75)', fontSize:'12.5px', lineHeight:1.5, marginBottom:'14px' }}>Build your profile, discover opportunities, and track every application.</p>
+              <div style={{ display:'flex', flexDirection:'column', gap:'8px', position:'relative', zIndex:1 }}>
+                <Link to="/register?role=seeker" onClick={e=>e.stopPropagation()} style={{ background:'#fff', color:BLUE, fontWeight:700, fontSize:'12.5px', padding:'9px 16px', borderRadius:'16px', textAlign:'center' }}>Create Profile</Link>
+                <Link to="/jobs" onClick={e=>e.stopPropagation()} style={{ color:'#fff', fontSize:'12.5px', fontWeight:500, padding:'9px 16px', border:'1px solid rgba(255,255,255,0.5)', borderRadius:'16px', textAlign:'center' }}>Browse Jobs</Link>
+              </div>
             </div>
-            <p style={{ color:'#555', fontSize:'14px', lineHeight:1.6, marginBottom:'16px' }}>Build your profile, discover thousands of opportunities, and track every application in one place.</p>
-            <div style={{ display:'flex', gap:'10px', flexWrap:'wrap', position:'relative', zIndex:1 }}>
-              <Link to="/register?role=seeker" onClick={e=>e.stopPropagation()} style={{ background:BLUE, color:'#fff', fontWeight:600, fontSize:'13px', padding:'9px 20px', borderRadius:'18px' }}>Create Profile</Link>
-              <Link to="/jobs" onClick={e=>e.stopPropagation()} style={{ color:BLUE, fontSize:'13px', fontWeight:500, padding:'9px 20px', border:`1px solid ${BLUE}`, borderRadius:'18px' }}>Browse Jobs</Link>
+
+            {/* Center content */}
+            <div style={{ textAlign:'center' }}>
+              <span className="strip-badge">STAFFING AND CAREER SOLUTIONS</span>
+              <h1 style={{ fontSize:'clamp(1.4rem, 3vw, 2rem)', fontWeight:700, color:'white', lineHeight:1.3, marginBottom:'22px' }}>
+                Connecting Professionals to the Right Opportunities
+              </h1>
+              <form onSubmit={handleSearch} className="h-form">
+                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Job title, company, or keyword..." />
+                <button type="submit">Search Jobs</button>
+              </form>
+              <div className="h-tags">
+                {['React Developer','HR Manager','Data Analyst','Marketing Lead','Node.js'].map(t => (
+                  <button key={t} onClick={() => navigate(`/jobs?search=${t}`)}>{t}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* Employer card */}
+            <div className="hero-side-card employer" onClick={() => navigate('/register?role=recruiter')} role="button" tabIndex={0}>
+              <span style={{ fontSize:'1.7rem', marginBottom:'8px' }}>🏢</span>
+              <h2 style={{ fontWeight:700, fontSize:'16px', color:'#fff', marginBottom:'6px' }}>I'm an Employer</h2>
+              <p style={{ color:'rgba(255,255,255,0.75)', fontSize:'12.5px', lineHeight:1.5, marginBottom:'14px' }}>Post vacancies, review candidates, and manage your hiring pipeline.</p>
+              <div style={{ display:'flex', flexDirection:'column', gap:'8px', position:'relative', zIndex:1 }}>
+                <Link to="/register?role=recruiter" onClick={e=>e.stopPropagation()} style={{ background:'#FF9933', color:'#062b56', fontWeight:700, fontSize:'12.5px', padding:'9px 16px', borderRadius:'16px', textAlign:'center' }}>Post a Job</Link>
+                <Link to="/login" onClick={e=>e.stopPropagation()} style={{ color:'#fff', fontSize:'12.5px', fontWeight:500, padding:'9px 16px', border:'1px solid rgba(255,153,51,0.6)', borderRadius:'16px', textAlign:'center' }}>Sign In</Link>
+              </div>
             </div>
           </div>
-          <div className="journey-card journey-recruiter" onClick={() => navigate('/register?role=recruiter')} role="button" tabIndex={0}>
-            <div style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'10px' }}>
-              <span style={{ fontSize:'1.8rem' }}>🏢</span>
-              <h2 style={{ fontWeight:700, fontSize:'19px', color:'#1a1a1a' }}>I'm an Employer</h2>
-            </div>
-            <p style={{ color:'#555', fontSize:'14px', lineHeight:1.6, marginBottom:'16px' }}>Post vacancies, review matched candidates, and manage your hiring pipeline with ease.</p>
-            <div style={{ display:'flex', gap:'10px', flexWrap:'wrap', position:'relative', zIndex:1 }}>
-              <Link to="/register?role=recruiter" onClick={e=>e.stopPropagation()} style={{ background:'#e07b00', color:'#fff', fontWeight:600, fontSize:'13px', padding:'9px 20px', borderRadius:'18px' }}>Post a Job</Link>
-              <Link to="/login" onClick={e=>e.stopPropagation()} style={{ color:'#e07b00', fontSize:'13px', fontWeight:500, padding:'9px 20px', border:'1px solid #e07b00', borderRadius:'18px' }}>Sign In</Link>
-            </div>
+
+          <div className="stats-bar">
+            {STATS.map(s => (
+              <div key={s.label} style={{ padding:'16px 12px', textAlign:'center' }}>
+                <div style={{ color:'#fff', fontWeight:700, fontSize:'1.3rem' }}>{s.value}</div>
+                <div style={{ color:'rgba(255,255,255,0.55)', fontSize:'12px', marginTop:'2px' }}>{s.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

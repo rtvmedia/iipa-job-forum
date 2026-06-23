@@ -16,13 +16,18 @@ export default function Footer() {
         <div>
           <div style={{ display:'flex', alignItems:'center', gap:'12px', marginBottom:'8px' }}>
             {logoUrl && (
-              <span style={{
-                display:'flex', alignItems:'center', justifyContent:'center',
-                width:'44px', height:'44px', borderRadius:'50%', background:'#fff',
-                boxShadow:'0 2px 8px rgba(0,0,0,0.25)', border:'2px solid #FF9933',
-                overflow:'hidden', flexShrink:0,
-              }}>
-                <img src={logoUrl} alt="Logo" style={{ width:'80%', height:'80%', objectFit:'contain' }} />
+              <span style={{ display:'flex', flexDirection:'column', alignItems:'center', flexShrink:0 }}>
+                <span style={{
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                  width:'42px', height:'42px', borderRadius:'50%', background:'#fff',
+                  boxShadow:'0 2px 8px rgba(0,0,0,0.25)', border:'2px solid #FF9933',
+                  overflow:'hidden',
+                }}>
+                  <img src={logoUrl} alt="Logo" style={{ width:'92%', height:'92%', objectFit:'contain', borderRadius:'50%' }} />
+                </span>
+                <span style={{ color:'rgba(255,255,255,0.55)', fontSize:'7px', fontWeight:600, lineHeight:1.2, textAlign:'center', marginTop:'2px' }}>
+                  International Indian<br />Professionals Association
+                </span>
               </span>
             )}
             <span style={{ display:'flex', flexDirection:'column', justifyContent:'center', gap:'1px' }}>

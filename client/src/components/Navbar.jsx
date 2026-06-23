@@ -26,18 +26,23 @@ export default function Navbar() {
   return (
     <nav style={{ background:'#1a237e', position:'sticky', top:0, zIndex:50, boxShadow:'0 1px 3px rgba(0,0,0,0.2)' }}>
       <div className="tricolor" />
-      <div style={{ maxWidth:'1128px', margin:'0 auto', padding:'0 16px', display:'flex', alignItems:'center', justifyContent:'space-between', height:'68px' }}>
+      <div style={{ maxWidth:'1128px', margin:'0 auto', padding:'0 16px', display:'flex', alignItems:'center', justifyContent:'space-between', height:'78px' }}>
 
         {/* Logo */}
         <Link to="/" onClick={() => setOpen(false)} style={{ display:'flex', alignItems:'center', gap:'12px' }}>
           {logoUrl && (
-            <span style={{
-              display:'flex', alignItems:'center', justifyContent:'center',
-              width:'48px', height:'48px', borderRadius:'50%', background:'#fff',
-              boxShadow:'0 2px 8px rgba(0,0,0,0.25)', border:'2px solid #FF9933',
-              overflow:'hidden', flexShrink:0,
-            }}>
-              <img src={logoUrl} alt="Logo" style={{ width:'80%', height:'80%', objectFit:'contain' }} />
+            <span style={{ display:'flex', flexDirection:'column', alignItems:'center', flexShrink:0 }}>
+              <span style={{
+                display:'flex', alignItems:'center', justifyContent:'center',
+                width:'46px', height:'46px', borderRadius:'50%', background:'#fff',
+                boxShadow:'0 2px 8px rgba(0,0,0,0.25)', border:'2px solid #FF9933',
+                overflow:'hidden',
+              }}>
+                <img src={logoUrl} alt="Logo" style={{ width:'92%', height:'92%', objectFit:'contain', borderRadius:'50%' }} />
+              </span>
+              <span style={{ color:'rgba(255,255,255,0.7)', fontSize:'7.5px', fontWeight:600, lineHeight:1.2, textAlign:'center', marginTop:'2px', letterSpacing:'0.01em' }}>
+                International Indian<br />Professionals Association
+              </span>
             </span>
           )}
           <span style={{ display:'flex', flexDirection:'column', justifyContent:'center', gap:'1px' }}>
