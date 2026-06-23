@@ -26,17 +26,31 @@ export default function Navbar() {
   return (
     <nav style={{ background:'#1a237e', position:'sticky', top:0, zIndex:50, boxShadow:'0 1px 3px rgba(0,0,0,0.2)' }}>
       <div className="tricolor" />
-      <div style={{ maxWidth:'1128px', margin:'0 auto', padding:'0 16px', display:'flex', alignItems:'center', justifyContent:'space-between', height:'52px' }}>
+      <div style={{ maxWidth:'1128px', margin:'0 auto', padding:'0 16px', display:'flex', alignItems:'center', justifyContent:'space-between', height:'68px' }}>
 
         {/* Logo */}
-        <Link to="/" onClick={() => setOpen(false)} style={{ display:'flex', alignItems:'baseline', gap:'8px' }}>
-          {logoUrl && <img src={logoUrl} alt="Logo" style={{ height:'30px', width:'auto', marginRight:'2px' }} />}
-          <span style={{ display:'flex', alignItems:'baseline', gap:'6px' }}>
-            <span style={{ color:'#FF9933', fontWeight:700, fontSize:'18px' }}>IIPA</span>
-            <span style={{ color:'white', fontWeight:600, fontSize:'16px' }}>JOBS</span>
-          </span>
-          <span className="brand-tagline" style={{ color:'rgba(255,255,255,0.55)', fontSize:'11px', fontWeight:500 }}>
-            Connecting Talents with Opportunities
+        <Link to="/" onClick={() => setOpen(false)} style={{ display:'flex', alignItems:'center', gap:'12px' }}>
+          {logoUrl && (
+            <span style={{
+              display:'flex', alignItems:'center', justifyContent:'center',
+              width:'48px', height:'48px', borderRadius:'50%', background:'#fff',
+              boxShadow:'0 2px 8px rgba(0,0,0,0.25)', border:'2px solid #FF9933',
+              overflow:'hidden', flexShrink:0,
+            }}>
+              <img src={logoUrl} alt="Logo" style={{ width:'80%', height:'80%', objectFit:'contain' }} />
+            </span>
+          )}
+          <span style={{ display:'flex', flexDirection:'column', justifyContent:'center', gap:'1px' }}>
+            <span style={{ display:'flex', alignItems:'baseline', gap:'6px' }}>
+              <span style={{ color:'#FF9933', fontWeight:700, fontSize:'19px' }}>IIPA</span>
+              <span style={{ color:'white', fontWeight:600, fontSize:'17px' }}>JOBS</span>
+            </span>
+            <span className="brand-tagline" style={{
+              color:'#FFC766', fontSize:'11.5px', fontWeight:600, letterSpacing:'0.02em',
+              fontStyle:'italic', textShadow:'0 1px 2px rgba(0,0,0,0.35)',
+            }}>
+              Connecting Talents with Opportunities
+            </span>
           </span>
         </Link>
 
@@ -126,7 +140,7 @@ export default function Navbar() {
       <style>{`
         .desk-nav { display: flex; }
         .mob-menu { display: none; }
-        @media (max-width: 900px) {
+        @media (max-width: 480px) {
           .brand-tagline { display: none !important; }
         }
         @media (max-width: 767px) {

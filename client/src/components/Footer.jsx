@@ -14,13 +14,28 @@ export default function Footer() {
       <div className="tricolor" />
       <div style={{ maxWidth:'1128px', margin:'0 auto', padding:'40px 16px 24px', display:'grid', gap:'32px', gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))' }}>
         <div>
-          <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'4px' }}>
-            {logoUrl && <img src={logoUrl} alt="Logo" style={{ height:'26px', width:'auto', marginRight:'2px' }} />}
-            <span style={{ color:'#FF9933', fontWeight:700, fontSize:'18px' }}>IIPA</span>
-            <span style={{ color:'white', fontWeight:600, fontSize:'15px' }}>JOBS</span>
+          <div style={{ display:'flex', alignItems:'center', gap:'12px', marginBottom:'8px' }}>
+            {logoUrl && (
+              <span style={{
+                display:'flex', alignItems:'center', justifyContent:'center',
+                width:'44px', height:'44px', borderRadius:'50%', background:'#fff',
+                boxShadow:'0 2px 8px rgba(0,0,0,0.25)', border:'2px solid #FF9933',
+                overflow:'hidden', flexShrink:0,
+              }}>
+                <img src={logoUrl} alt="Logo" style={{ width:'80%', height:'80%', objectFit:'contain' }} />
+              </span>
+            )}
+            <span style={{ display:'flex', flexDirection:'column', justifyContent:'center', gap:'1px' }}>
+              <span style={{ display:'flex', alignItems:'baseline', gap:'6px' }}>
+                <span style={{ color:'#FF9933', fontWeight:700, fontSize:'18px' }}>IIPA</span>
+                <span style={{ color:'white', fontWeight:600, fontSize:'15px' }}>JOBS</span>
+              </span>
+              <span style={{ color:'#FFC766', fontSize:'11px', fontWeight:600, fontStyle:'italic', letterSpacing:'0.02em' }}>
+                Connecting Talents with Opportunities
+              </span>
+            </span>
           </div>
-          <p style={{ fontSize:'12px', color:'rgba(255,255,255,0.5)', marginBottom:'10px' }}>Connecting Talents with Opportunities</p>
-          <p style={{ fontSize:'13px', lineHeight:1.6 }}>Your trusted career partner — connecting professionals with leading employers across India.</p>
+          <p style={{ fontSize:'13px', lineHeight:1.6, marginTop:'10px' }}>Your trusted career partner — connecting professionals with leading employers across India.</p>
         </div>
         <div>
           <h4 style={{ color:'white', fontWeight:600, fontSize:'14px', marginBottom:'12px' }}>For Job Seekers</h4>
