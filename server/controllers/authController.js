@@ -54,8 +54,11 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const { fullName, phone, location, headline, bio } = req.body;
-    await User.update({ fullName, phone, location, headline, bio }, { where: { id: req.user.id } });
+    const { fullName, phone, location, headline, bio, companyName, companyWebsite, companyIndustry, companyAbout } = req.body;
+    await User.update(
+      { fullName, phone, location, headline, bio, companyName, companyWebsite, companyIndustry, companyAbout },
+      { where: { id: req.user.id } }
+    );
     const updated = await User.findByPk(req.user.id, { attributes: { exclude: ['password'] } });
     res.json(updated);
   } catch (err) {
@@ -63,4 +66,15 @@ const updateProfile = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getProfile, updateProfile };
+const uploadResume = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+    const resumeUrl = `/uploads/${req.file.filename}`;
+    await User.update({ resumeUrl }, { where: { id: req.user.id } });
+    res.json({ resumeUrl });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { register, login, getProfile, updateProfile, uploadResume };

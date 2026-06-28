@@ -29,6 +29,18 @@ router.delete('/albums/:id',                   ctrl.deleteAlbum);
 router.post('/albums/:id/images',              upload.single('image'), ctrl.addAlbumImage);
 router.delete('/albums/:id/images/:imageId',   ctrl.deleteAlbumImage);
 
-router.put('/settings', upload.fields([{ name: 'headerLogo', maxCount: 1 }, { name: 'footerLogo', maxCount: 1 }]), ctrl.updateSettings);
+router.put('/settings', upload.fields([
+  { name: 'headerLogo', maxCount: 1 },
+  { name: 'footerLogo', maxCount: 1 },
+  { name: 'seekerBarcode', maxCount: 1 },
+  { name: 'employerBarcode', maxCount: 1 },
+]), ctrl.updateSettings);
+router.delete('/settings/seeker-barcode',   ctrl.deleteSeekerBarcode);
+router.delete('/settings/employer-barcode', ctrl.deleteEmployerBarcode);
+
+router.get('/jobs',           ctrl.getAllJobsAdmin);
+router.post('/jobs',          ctrl.createJobAdmin);
+router.put('/jobs/:id',       ctrl.updateJobAdmin);
+router.delete('/jobs/:id',    ctrl.deleteJobAdmin);
 
 module.exports = router;

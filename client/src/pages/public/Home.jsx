@@ -1,28 +1,98 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
+import {
+  CpuChipIcon, BanknotesIcon, UserGroupIcon, MegaphoneIcon,
+  WrenchScrewdriverIcon, HeartIcon, AcademicCapIcon, ChartBarIcon,
+  MagnifyingGlassIcon, BuildingOffice2Icon, MapPinIcon,
+} from '@heroicons/react/24/outline';
 
 const CATEGORIES = [
-  { name:'Technology',      icon:'💻', count:420 },
-  { name:'Finance',         icon:'📊', count:310 },
-  { name:'Human Resources', icon:'👥', count:185 },
-  { name:'Marketing',       icon:'📣', count:260 },
-  { name:'Engineering',     icon:'⚙️',  count:340 },
-  { name:'Healthcare',      icon:'🏥', count:215 },
-  { name:'Education',       icon:'🎓', count:190 },
-  { name:'Sales',           icon:'🤝', count:275 },
+  { name:'Technology',      Icon:CpuChipIcon },
+  { name:'Finance',         Icon:BanknotesIcon },
+  { name:'Human Resources', Icon:UserGroupIcon },
+  { name:'Marketing',       Icon:MegaphoneIcon },
+  { name:'Engineering',     Icon:WrenchScrewdriverIcon },
+  { name:'Healthcare',      Icon:HeartIcon },
+  { name:'Education',       Icon:AcademicCapIcon },
+  { name:'Sales',           Icon:ChartBarIcon },
+];
+
+const LOCATIONS = [
+  { country:'India', cities:['Mumbai','Delhi','Bangalore','Hyderabad','Chennai','Pune','Kolkata'] },
+  { country:'Saudi Arabia', cities:['Riyadh','Jeddah','Dammam','Khobar','Mecca','Medina','Jubail','Eastern Province'] },
+  { country:'UAE', cities:['Dubai','Abu Dhabi','Sharjah','Ajman'] },
+  { country:'Qatar', cities:['Doha'] },
+  { country:'Kuwait', cities:['Kuwait City'] },
+  { country:'Oman', cities:['Muscat'] },
+  { country:'Bahrain', cities:['Manama'] },
 ];
 
 const W = '1128px';
 const BLUE = '#0a66c2';
 const BLUE_DARK = '#004182';
 
+function LocationDropdown({ value, onChange }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const onClick = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('click', onClick);
+    return () => document.removeEventListener('click', onClick);
+  }, []);
+
+  const q = query.trim().toLowerCase();
+  const filtered = LOCATIONS.map(g => ({
+    country: g.country,
+    cities: g.cities.filter(c => !q || c.toLowerCase().includes(q) || g.country.toLowerCase().includes(q)),
+  })).filter(g => !q || g.country.toLowerCase().includes(q) || g.cities.length > 0);
+
+  return (
+    <div ref={ref} style={{ position:'relative', flex:'1 1 200px', minWidth:0 }}>
+      <button type="button" onClick={() => setOpen(o => !o)}
+        style={{ width:'100%', display:'flex', alignItems:'center', gap:'6px', padding:'13px 14px', border:'none', borderRadius:'6px', background:'#f3f5f8', fontSize:'14px', color: value ? '#1a1a1a' : '#888', cursor:'pointer', textAlign:'left' }}>
+        <MapPinIcon style={{ width:'17px', height:'17px', flexShrink:0, color:'#888' }} />
+        <span style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{value || 'Any Location'}</span>
+      </button>
+      {open && (
+        <div style={{ position:'absolute', top:'46px', left:0, right:0, background:'#fff', borderRadius:'10px', boxShadow:'0 12px 30px rgba(0,0,0,0.25)', zIndex:90, maxHeight:'320px', overflowY:'auto', textAlign:'left' }}>
+          <div style={{ padding:'10px' }}>
+            <input autoFocus value={query} onChange={e => setQuery(e.target.value)} placeholder="Search country or city..."
+              style={{ width:'100%', border:'1px solid #ddd', borderRadius:'6px', padding:'8px 10px', fontSize:'13px', outline:'none', boxSizing:'border-box' }} />
+          </div>
+          <div onClick={() => { onChange(''); setOpen(false); setQuery(''); }}
+            style={{ padding:'8px 14px', fontSize:'13.5px', fontWeight:600, color:BLUE, cursor:'pointer' }}>Any Location</div>
+          {filtered.map(g => (
+            <div key={g.country}>
+              <div onClick={() => { onChange(g.country); setOpen(false); setQuery(''); }}
+                style={{ padding:'8px 14px', fontSize:'13.5px', fontWeight:700, color:'#1a1a1a', cursor:'pointer', background:'#f8f9fb' }}>
+                {g.country}
+              </div>
+              {g.cities.map(c => (
+                <div key={c} onClick={() => { onChange(`${g.country} - ${c}`); setOpen(false); setQuery(''); }}
+                  style={{ padding:'7px 14px 7px 26px', fontSize:'13px', color:'#444', cursor:'pointer' }}
+                  onMouseEnter={e=>e.currentTarget.style.background='#f0f4fb'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                  {g.country} · {c}
+                </div>
+              ))}
+            </div>
+          ))}
+          {filtered.length === 0 && <p style={{ padding:'12px', fontSize:'13px', color:'#999' }}>No matches.</p>}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Home() {
-  const [search, setSearch]   = useState('');
-  const [jobs, setJobs]       = useState([]);
-  const [allJobs, setAllJobs] = useState([]);
-  const [news, setNews]       = useState([]);
-  const [events, setEvents]   = useState([]);
+  const [search, setSearch]     = useState('');
+  const [location, setLocation] = useState('');
+  const [jobs, setJobs]         = useState([]);
+  const [allJobs, setAllJobs]   = useState([]);
+  const [news, setNews]         = useState([]);
+  const [events, setEvents]     = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,14 +101,24 @@ export default function Home() {
     api.get('/events').then(r => setEvents(r.data.slice(0,4))).catch(()=>{});
   }, []);
 
-  const handleSearch = e => { e.preventDefault(); navigate(`/jobs?search=${encodeURIComponent(search)}`); };
+  const handleSearch = e => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (search) params.set('search', search);
+    if (location) params.set('location', location.includes(' - ') ? location.split(' - ')[1].trim() : location);
+    navigate(`/jobs?${params.toString()}`);
+  };
 
   const activeJobs = allJobs.length;
   const companies  = new Set(allJobs.map(j => j.company)).size;
+  const categoryCounts = CATEGORIES.map(c => ({
+    ...c,
+    count: allJobs.filter(j => (j.category || '').toLowerCase() === c.name.toLowerCase()).length,
+  }));
 
   const STATS = [
-    { value: activeJobs ? `${activeJobs}+` : '—', label:'Active Jobs' },
-    { value: companies  ? `${companies}+`  : '—', label:'Companies' },
+    { value: activeJobs ? `${activeJobs}+` : '0', label:'Active Jobs' },
+    { value: companies  ? `${companies}+`  : '0', label:'Companies' },
     { value:'18,000+', label:'Professionals' },
     { value:'94%',     label:'Placement Rate' },
   ];
@@ -47,11 +127,11 @@ export default function Home() {
     <div>
       <style>{`
         .h-form {
-          display:flex; flex-wrap:wrap; gap:8px; max-width:620px; margin:0 auto;
+          display:flex; flex-wrap:wrap; gap:8px; max-width:680px; margin:0 auto;
           background:#fff; padding:8px; border-radius:10px;
           box-shadow:0 8px 28px rgba(0,0,0,0.25), 0 0 0 3px rgba(255,153,51,0.35);
         }
-        .h-form input { flex:1 1 200px; min-width:0; padding:13px 16px; border-radius:6px; border:none; font-size:14px; outline:none; }
+        .h-form input { flex:1 1 200px; min-width:0; padding:13px 16px; border-radius:6px; border:none; font-size:14px; outline:none; background:#f3f5f8; }
         .h-form button { flex:0 0 auto; padding:13px 26px; background:linear-gradient(135deg, #FF9933, #e07b00); color:#fff; font-weight:700; font-size:14px; border:none; border-radius:6px; cursor:pointer; white-space:nowrap; box-shadow:0 4px 10px rgba(224,123,0,0.35); }
         .h-form button:hover { background:linear-gradient(135deg, #e07b00, #c66800); }
         .h-tags { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:14px; }
@@ -64,15 +144,18 @@ export default function Home() {
         .stats-bar { display:grid; grid-template-columns:repeat(2,1fr); max-width:760px; margin:36px auto 0; background:rgba(255,255,255,0.1); border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.15); }
         @media(min-width:600px){ .stats-bar{ grid-template-columns:repeat(4,1fr); } }
         .hero-layout { display:grid; grid-template-columns:1fr; gap:20px; align-items:stretch; }
-        @media(min-width:920px){ .hero-layout{ grid-template-columns:230px 1fr 230px; } }
+        @media(min-width:920px){ .hero-layout{ grid-template-columns:260px 1fr 260px; } }
         .hero-side-card {
-          position:relative; display:flex; flex-direction:column; text-align:left; cursor:pointer;
-          background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.22);
-          border-radius:18px; padding:22px; backdrop-filter:blur(6px);
-          transition:transform 0.2s ease, background 0.2s ease;
+          position:relative; display:flex; flex-direction:column; text-align:left; cursor:pointer; overflow:hidden;
+          border-radius:20px; padding:26px; min-height:300px;
+          box-shadow:0 14px 34px rgba(0,0,0,0.22);
+          transition:transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .hero-side-card:hover { transform:translateY(-5px); background:rgba(255,255,255,0.16); }
-        .hero-side-card.employer { border-color:rgba(255,153,51,0.4); }
+        .hero-side-card:hover { transform:translateY(-6px); box-shadow:0 20px 44px rgba(0,0,0,0.3); }
+        .hero-side-card.seeker { background:linear-gradient(160deg, #0d9488 0%, #0f766e 60%, #115e59 100%); }
+        .hero-side-card.employer { background:linear-gradient(160deg, #f59e0b 0%, #d97706 60%, #b45309 100%); }
+        .hero-icon-badge { width:52px; height:52px; border-radius:14px; background:rgba(255,255,255,0.18); display:flex; align-items:center; justify-content:center; margin-bottom:14px; }
+        .hero-stat-chip { display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.16); border-radius:10px; padding:8px 12px; font-size:12px; color:#fff; font-weight:600; margin-top:auto; }
         .cat-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
         @media(min-width:480px){ .cat-grid{ grid-template-columns:repeat(3,1fr); } }
         @media(min-width:768px){ .cat-grid{ grid-template-columns:repeat(4,1fr); } }
@@ -87,12 +170,15 @@ export default function Home() {
 
         .cat-card {
           background:linear-gradient(160deg, #ffffff 0%, #f3f8ff 100%);
-          border-radius:12px; padding:18px 12px; text-align:center; display:block;
+          border-radius:12px; padding:20px 12px; text-align:center; display:block;
           border:1px solid #dbe8fb; box-shadow:0 4px 14px rgba(10,102,194,0.08);
           transition:transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
         }
         .cat-card:hover { transform:translateY(-4px); border-color:${BLUE}; box-shadow:0 10px 24px rgba(10,102,194,0.22); }
         .cat-card:hover .cat-name { color:${BLUE} !important; }
+        .cat-icon-wrap { width:44px; height:44px; border-radius:12px; background:#eaf2fe; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; transition:background 0.18s; }
+        .cat-card:hover .cat-icon-wrap { background:${BLUE}; }
+        .cat-card:hover .cat-icon-wrap svg { color:#fff !important; }
 
         .job-card {
           background:linear-gradient(160deg, #ffffff 0%, #f6f9ff 100%);
@@ -129,14 +215,11 @@ export default function Home() {
           <div className="hero-layout">
 
             {/* Job Seeker card */}
-            <div className="hero-side-card" onClick={() => navigate('/jobs')} role="button" tabIndex={0}>
-              <span style={{ fontSize:'1.7rem', marginBottom:'8px' }}>🔍</span>
-              <h2 style={{ fontWeight:700, fontSize:'16px', color:'#fff', marginBottom:'6px' }}>I'm a Job Seeker</h2>
-              <p style={{ color:'rgba(255,255,255,0.75)', fontSize:'12.5px', lineHeight:1.5, marginBottom:'14px' }}>Build your profile, discover opportunities, and track every application.</p>
-              <div style={{ display:'flex', flexDirection:'column', gap:'8px', position:'relative', zIndex:1 }}>
-                <Link to="/register?role=seeker" onClick={e=>e.stopPropagation()} style={{ background:'#fff', color:BLUE, fontWeight:700, fontSize:'12.5px', padding:'9px 16px', borderRadius:'16px', textAlign:'center' }}>Create Profile</Link>
-                <Link to="/jobs" onClick={e=>e.stopPropagation()} style={{ color:'#fff', fontSize:'12.5px', fontWeight:500, padding:'9px 16px', border:'1px solid rgba(255,255,255,0.5)', borderRadius:'16px', textAlign:'center' }}>Browse Jobs</Link>
-              </div>
+            <div className="hero-side-card seeker" onClick={() => navigate('/jobs')} role="button" tabIndex={0}>
+              <div className="hero-icon-badge"><MagnifyingGlassIcon style={{ width:'26px', height:'26px', color:'#fff' }} /></div>
+              <h2 style={{ fontWeight:700, fontSize:'18px', color:'#fff', marginBottom:'8px' }}>I'm a Job Seeker</h2>
+              <p style={{ color:'rgba(255,255,255,0.85)', fontSize:'13px', lineHeight:1.6, marginBottom:'16px' }}>Build your profile, discover thousands of opportunities, and track every application — all in one place.</p>
+              <span className="hero-stat-chip">👥 {activeJobs ? `${activeJobs}+` : ''} roles open now</span>
             </div>
 
             {/* Center content */}
@@ -147,6 +230,7 @@ export default function Home() {
               </h1>
               <form onSubmit={handleSearch} className="h-form">
                 <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Job title, company, or keyword..." />
+                <LocationDropdown value={location} onChange={setLocation} />
                 <button type="submit">Search Jobs</button>
               </form>
               <div className="h-tags">
@@ -157,14 +241,11 @@ export default function Home() {
             </div>
 
             {/* Employer card */}
-            <div className="hero-side-card employer" onClick={() => navigate('/register?role=recruiter')} role="button" tabIndex={0}>
-              <span style={{ fontSize:'1.7rem', marginBottom:'8px' }}>🏢</span>
-              <h2 style={{ fontWeight:700, fontSize:'16px', color:'#fff', marginBottom:'6px' }}>I'm an Employer</h2>
-              <p style={{ color:'rgba(255,255,255,0.75)', fontSize:'12.5px', lineHeight:1.5, marginBottom:'14px' }}>Post vacancies, review candidates, and manage your hiring pipeline.</p>
-              <div style={{ display:'flex', flexDirection:'column', gap:'8px', position:'relative', zIndex:1 }}>
-                <Link to="/register?role=recruiter" onClick={e=>e.stopPropagation()} style={{ background:'#FF9933', color:'#062b56', fontWeight:700, fontSize:'12.5px', padding:'9px 16px', borderRadius:'16px', textAlign:'center' }}>Post a Job</Link>
-                <Link to="/login" onClick={e=>e.stopPropagation()} style={{ color:'#fff', fontSize:'12.5px', fontWeight:500, padding:'9px 16px', border:'1px solid rgba(255,153,51,0.6)', borderRadius:'16px', textAlign:'center' }}>Sign In</Link>
-              </div>
+            <div className="hero-side-card employer" onClick={() => navigate('/employers')} role="button" tabIndex={0}>
+              <div className="hero-icon-badge"><BuildingOffice2Icon style={{ width:'26px', height:'26px', color:'#fff' }} /></div>
+              <h2 style={{ fontWeight:700, fontSize:'18px', color:'#fff', marginBottom:'8px' }}>I'm an Employer</h2>
+              <p style={{ color:'rgba(255,255,255,0.9)', fontSize:'13px', lineHeight:1.6, marginBottom:'16px' }}>Post vacancies, review matched candidates, and manage your full hiring pipeline with ease.</p>
+              <span className="hero-stat-chip">🏢 {companies ? `${companies}+` : ''} companies hiring</span>
             </div>
           </div>
 
@@ -187,9 +268,9 @@ export default function Home() {
           <h2 style={{ fontWeight:700, fontSize:'17px', color:'#1a1a1a', marginBottom:'4px' }}>Browse by Category</h2>
           <p style={{ color:'#666', fontSize:'13px', marginBottom:'16px' }}>Explore opportunities across all industries</p>
           <div className="cat-grid">
-            {CATEGORIES.map(c => (
+            {categoryCounts.map(c => (
               <Link key={c.name} to={`/jobs?category=${encodeURIComponent(c.name)}`} className="cat-card">
-                <div style={{ fontSize:'1.5rem', marginBottom:'6px' }}>{c.icon}</div>
+                <div className="cat-icon-wrap"><c.Icon style={{ width:'22px', height:'22px', color:BLUE }} /></div>
                 <div className="cat-name" style={{ fontWeight:600, fontSize:'13px', color:'#1a1a1a' }}>{c.name}</div>
                 <div style={{ fontSize:'12px', color:'#888', marginTop:'2px' }}>{c.count} jobs</div>
               </Link>
@@ -209,7 +290,7 @@ export default function Home() {
         {jobs.length === 0 ? (
           <div style={{ textAlign:'center', color:'#999', padding:'40px 0' }}>
             <div style={{ fontSize:'2rem', marginBottom:'8px' }}>📋</div>
-            Loading jobs...
+            No jobs posted yet.
           </div>
         ) : (
           <div className="jobs-grid">

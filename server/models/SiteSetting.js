@@ -5,6 +5,11 @@ const SiteSetting = sequelize.define('SiteSetting', {
   id:             { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   headerLogoUrl:  { type: DataTypes.STRING(300) },
   footerLogoUrl:  { type: DataTypes.STRING(300) },
+  linkedinUrl:        { type: DataTypes.STRING(300) },
+  seekerBarcodeUrl:   { type: DataTypes.STRING(300) },
+  seekerWhatsappUrl:  { type: DataTypes.STRING(300) },
+  employerBarcodeUrl: { type: DataTypes.STRING(300) },
+  employerWhatsappUrl:{ type: DataTypes.STRING(300) },
 }, { tableName: 'site_settings', timestamps: true });
 
 module.exports = SiteSetting;

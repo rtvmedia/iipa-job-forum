@@ -1,13 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/axios';
+import { useAuth } from '../context/AuthContext';
 
 export default function Footer() {
-  const [logoUrl, setLogoUrl] = useState(null);
+  const { user } = useAuth();
+  const [settings, setSettings] = useState({});
 
   useEffect(() => {
-    api.get('/settings').then(r => setLogoUrl(r.data?.footerLogoUrl || null)).catch(() => {});
+    api.get('/settings').then(r => setSettings(r.data || {})).catch(() => {});
   }, []);
+
+  const logoUrl = settings.footerLogoUrl;
+  const showSeekerBarcode   = user?.role === 'seeker'    && settings.seekerBarcodeUrl;
+  const showEmployerBarcode = user?.role === 'recruiter' && settings.employerBarcodeUrl;
 
   return (
     <footer style={{ background:'#1a237e', color:'rgba(255,255,255,0.75)', marginTop:'auto' }}>
@@ -23,7 +29,7 @@ export default function Footer() {
                   boxShadow:'0 2px 8px rgba(0,0,0,0.25)', border:'2px solid #FF9933',
                   overflow:'hidden',
                 }}>
-                  <img src={logoUrl} alt="Logo" style={{ width:'92%', height:'92%', objectFit:'contain', borderRadius:'50%' }} />
+                  <img src={logoUrl} alt="Logo" style={{ width:'42px', height:'42px', objectFit:'cover', borderRadius:'50%', display:'block' }} />
                 </span>
                 <span style={{ color:'rgba(255,255,255,0.55)', fontSize:'7px', fontWeight:600, lineHeight:1.2, textAlign:'center', marginTop:'2px' }}>
                   International Indian<br />Professionals Association
@@ -40,6 +46,14 @@ export default function Footer() {
               </span>
             </span>
           </div>
+          {settings.linkedinUrl && (
+            <a href={settings.linkedinUrl} target="_blank" rel="noopener noreferrer"
+              style={{ display:'inline-flex', alignItems:'center', gap:'6px', color:'rgba(255,255,255,0.7)', fontSize:'13px', marginTop:'8px' }}
+              onMouseEnter={e=>e.currentTarget.style.color='#FF9933'} onMouseLeave={e=>e.currentTarget.style.color='rgba(255,255,255,0.7)'}>
+              <span style={{ display:'inline-flex', alignItems:'center', justifyContent:'center', width:'22px', height:'22px', borderRadius:'4px', background:'#0a66c2', color:'#fff', fontWeight:700, fontSize:'12px' }}>in</span>
+              LinkedIn
+            </a>
+          )}
         </div>
         <div>
           <h4 style={{ color:'white', fontWeight:600, fontSize:'14px', marginBottom:'12px' }}>For Job Seekers</h4>
@@ -48,13 +62,25 @@ export default function Footer() {
             <Link to="/register"         style={{ color:'rgba(255,255,255,0.65)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>Create Profile</Link>
             <Link to="/seeker/dashboard" style={{ color:'rgba(255,255,255,0.65)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>My Applications</Link>
           </div>
+          {showSeekerBarcode && (
+            <a href={settings.seekerWhatsappUrl || '#'} target="_blank" rel="noopener noreferrer" style={{ display:'inline-block', marginTop:'14px' }}>
+              <img src={settings.seekerBarcodeUrl} alt="Job Seekers WhatsApp Group" style={{ width:'88px', height:'88px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.2)' }} />
+              <p style={{ fontSize:'11px', color:'rgba(255,255,255,0.6)', marginTop:'4px' }}>Join Seekers WhatsApp Group</p>
+            </a>
+          )}
         </div>
         <div>
           <h4 style={{ color:'white', fontWeight:600, fontSize:'14px', marginBottom:'12px' }}>For Employers</h4>
           <div style={{ display:'flex', flexDirection:'column', gap:'8px', fontSize:'13px' }}>
-            <Link to="/register"            style={{ color:'rgba(255,255,255,0.65)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>Post a Job</Link>
+            <Link to="/employers"           style={{ color:'rgba(255,255,255,0.65)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>Post a Job</Link>
             <Link to="/recruiter/dashboard" style={{ color:'rgba(255,255,255,0.65)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>Recruiter Dashboard</Link>
           </div>
+          {showEmployerBarcode && (
+            <a href={settings.employerWhatsappUrl || '#'} target="_blank" rel="noopener noreferrer" style={{ display:'inline-block', marginTop:'14px' }}>
+              <img src={settings.employerBarcodeUrl} alt="Recruiter WhatsApp Group" style={{ width:'88px', height:'88px', borderRadius:'8px', border:'1px solid rgba(255,255,255,0.2)' }} />
+              <p style={{ fontSize:'11px', color:'rgba(255,255,255,0.6)', marginTop:'4px' }}>Join Recruiter WhatsApp Group</p>
+            </a>
+          )}
         </div>
         <div>
           <h4 style={{ color:'white', fontWeight:600, fontSize:'14px', marginBottom:'12px' }}>Company</h4>

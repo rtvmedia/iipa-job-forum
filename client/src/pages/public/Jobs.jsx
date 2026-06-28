@@ -16,6 +16,8 @@ export default function Jobs() {
   const search   = searchParams.get('search')   || '';
   const category = searchParams.get('category') || '';
   const type     = searchParams.get('type')     || '';
+  const location = searchParams.get('location') || '';
+  const view     = searchParams.get('view')     || '';
 
   useEffect(() => {
     setLoading(true);
@@ -23,8 +25,20 @@ export default function Jobs() {
     if (search)   params.search   = search;
     if (category) params.category = category;
     if (type)     params.type     = type;
+    if (location) params.location = location;
     api.get('/jobs', { params }).then(r => setJobs(r.data)).catch(()=>{}).finally(() => setLoading(false));
-  }, [search, category, type]);
+  }, [search, category, type, location]);
+
+  const groupBy = (key) => {
+    const groups = {};
+    jobs.forEach(j => {
+      const k = j[key] || 'Other';
+      (groups[k] = groups[k] || []).push(j);
+    });
+    return groups;
+  };
+
+  const sortedBySalary = [...jobs].sort((a, b) => (b.salaryMax || 0) - (a.salaryMax || 0));
 
   const set = (key, val) => {
     const p = Object.fromEntries(searchParams);
@@ -71,7 +85,9 @@ export default function Jobs() {
   return (
     <div style={{ maxWidth:'1128px', margin:'0 auto', padding:'24px 16px' }}>
       <div style={{ marginBottom:'20px' }}>
-        <h1 style={{ fontWeight:700, color:'#1a1a1a', fontSize:'22px' }}>Find Your Next Role</h1>
+        <h1 style={{ fontWeight:700, color:'#1a1a1a', fontSize:'22px' }}>
+          {view === 'location' ? 'Jobs by Location' : view === 'companies' ? 'Jobs by Companies' : view === 'salaries' ? 'Jobs by Salary' : 'Find Your Next Role'}
+        </h1>
         <p style={{ color:'#666', fontSize:'13px', marginTop:'4px' }}>{jobs.length} jobs found</p>
       </div>
 
@@ -103,6 +119,24 @@ export default function Jobs() {
             <div style={{ textAlign:'center', padding:'60px 0' }}>
               <div style={{ fontSize:'2.5rem', marginBottom:'10px' }}>🔍</div>
               <p style={{ color:'#666', fontSize:'14px' }}>No jobs match your filters. Try adjusting your search.</p>
+            </div>
+          ) : view === 'location' ? (
+            Object.entries(groupBy('location')).map(([loc, list]) => (
+              <div key={loc} style={{ marginBottom:'24px' }}>
+                <h3 style={{ fontWeight:700, fontSize:'14px', color:'#1a1a1a', marginBottom:'10px' }}>📍 {loc} <span style={{ color:'#888', fontWeight:500 }}>({list.length})</span></h3>
+                <div style={{ display:'grid', gap:'10px' }}>{list.map(job => <JobCard key={job.id} job={job} />)}</div>
+              </div>
+            ))
+          ) : view === 'companies' ? (
+            Object.entries(groupBy('company')).map(([comp, list]) => (
+              <div key={comp} style={{ marginBottom:'24px' }}>
+                <h3 style={{ fontWeight:700, fontSize:'14px', color:'#1a1a1a', marginBottom:'10px' }}>🏢 {comp} <span style={{ color:'#888', fontWeight:500 }}>({list.length})</span></h3>
+                <div style={{ display:'grid', gap:'10px' }}>{list.map(job => <JobCard key={job.id} job={job} />)}</div>
+              </div>
+            ))
+          ) : view === 'salaries' ? (
+            <div style={{ display:'grid', gap:'10px' }}>
+              {sortedBySalary.map(job => <JobCard key={job.id} job={job} />)}
             </div>
           ) : (
             <div style={{ display:'grid', gap:'10px' }}>

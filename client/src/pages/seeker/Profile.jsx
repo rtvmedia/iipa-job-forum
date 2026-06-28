@@ -10,13 +10,27 @@ export default function SeekerProfile() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved]   = useState(false);
   const [error, setError]   = useState('');
+  const [resumeUrl, setResumeUrl] = useState('');
+  const [uploadingResume, setUploadingResume] = useState(false);
 
   useEffect(() => {
     api.get('/auth/profile').then(r => {
-      const { fullName, phone, location, headline, bio } = r.data;
+      const { fullName, phone, location, headline, bio, resumeUrl } = r.data;
       setForm({ fullName: fullName||'', phone: phone||'', location: location||'', headline: headline||'', bio: bio||'' });
+      setResumeUrl(resumeUrl || '');
     }).catch(() => {});
   }, []);
+
+  const handleResumeUpload = async (file) => {
+    if (!file) return;
+    setUploadingResume(true);
+    try {
+      const formData = new FormData();
+      formData.append('resume', file);
+      const { data } = await api.post('/auth/resume', formData);
+      setResumeUrl(data.resumeUrl);
+    } finally { setUploadingResume(false); }
+  };
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -102,6 +116,30 @@ export default function SeekerProfile() {
             {saving ? 'Saving…' : 'Save Profile'}
           </button>
         </form>
+
+        <div className="p-6 border-t border-gray-100">
+          <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily:'system-ui' }}>Resume / CV</label>
+          {resumeUrl ? (
+            <div className="flex items-center gap-3 flex-wrap">
+              <a href={resumeUrl} target="_blank" rel="noopener noreferrer"
+                style={{ fontFamily:'system-ui' }}
+                className="text-sm font-semibold text-[#0a2342] border border-[#0a2342] px-4 py-2 rounded-xl hover:bg-[#0a2342] hover:text-white transition">
+                📄 View Resume
+              </a>
+              <label className="text-sm text-gray-600 cursor-pointer underline" style={{ fontFamily:'system-ui' }}>
+                {uploadingResume ? 'Uploading…' : 'Replace file'}
+                <input type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={e => handleResumeUpload(e.target.files[0])} />
+              </label>
+            </div>
+          ) : (
+            <label style={{ fontFamily:'system-ui' }}
+              className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-[#0a2342] px-5 py-2.5 rounded-xl cursor-pointer hover:bg-[#0d3060] transition">
+              {uploadingResume ? 'Uploading…' : '⬆ Upload CV'}
+              <input type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={e => handleResumeUpload(e.target.files[0])} />
+            </label>
+          )}
+          <p className="text-xs text-gray-400 mt-2" style={{ fontFamily:'system-ui' }}>PDF or Word document, up to 8MB.</p>
+        </div>
       </div>
     </div>
   );

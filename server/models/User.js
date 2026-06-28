@@ -15,6 +15,11 @@ const User = sequelize.define('User', {
   isActive:     { type: DataTypes.BOOLEAN, defaultValue: true },
   nationality:  { type: DataTypes.STRING(60), defaultValue: 'Indian' },
   approvalStatus: { type: DataTypes.ENUM('approved', 'pending', 'rejected'), defaultValue: 'approved' },
+  resumeUrl:       { type: DataTypes.STRING(300) },
+  companyName:     { type: DataTypes.STRING(150) },
+  companyWebsite:  { type: DataTypes.STRING(200) },
+  companyIndustry: { type: DataTypes.STRING(100) },
+  companyAbout:    { type: DataTypes.TEXT },
 }, { tableName: 'users', timestamps: true });
 
 module.exports = User;

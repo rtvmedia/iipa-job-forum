@@ -11,12 +11,15 @@ const RED    = '#dc2626';
 const TABS = [
   { key:'overview',     label:'Dashboard',    icon:'📊' },
   { key:'users',        label:'Users',        icon:'👥' },
+  { key:'jobs',         label:'Jobs',         icon:'💼' },
   { key:'approvals',    label:'Approvals',    icon:'✅' },
   { key:'coordinators', label:'Coordinators', icon:'🧭' },
   { key:'reports',      label:'Reports',      icon:'📈' },
   { key:'albums',       label:'Albums',       icon:'🖼️' },
   { key:'branding',     label:'Logo & Branding', icon:'🎨' },
 ];
+
+const JOB_TYPES = ['full-time','part-time','contract','internship','remote'];
 
 function StatCard({ label, value, color }) {
   return (
@@ -74,6 +77,7 @@ export default function AdminPanel() {
   const [tab, setTab] = useState('overview');
 
   const [users, setUsers]               = useState([]);
+  const [jobs, setJobs]                 = useState([]);
   const [approvals, setApprovals]       = useState({ users:[], jobs:[] });
   const [coordinators, setCoordinators] = useState([]);
   const [reports, setReports]           = useState(null);
@@ -83,17 +87,20 @@ export default function AdminPanel() {
   const [loading, setLoading]           = useState(false);
 
   const [editUser, setEditUser]           = useState(null);
+  const [jobModal, setJobModal]           = useState(null); // {} for create, job obj for edit
   const [editApprovalUser, setEditApprovalUser] = useState(null);
   const [editApprovalJob, setEditApprovalJob]   = useState(null);
   const [assignOpen, setAssignOpen]       = useState(false);
   const [albumModal, setAlbumModal]       = useState(null); // {} for create, album obj for edit
   const [manageAlbum, setManageAlbum]     = useState(null);
+  const [brandingText, setBrandingText]   = useState({ linkedinUrl:'', seekerWhatsappUrl:'', employerWhatsappUrl:'' });
 
   const loadAll = useCallback(async () => {
     setLoading(true);
     try {
-      const [u, a, c, r, al, ev, s] = await Promise.all([
+      const [u, j, a, c, r, al, ev, s] = await Promise.all([
         api.get('/admin/users'),
+        api.get('/admin/jobs'),
         api.get('/admin/approvals'),
         api.get('/admin/coordinators'),
         api.get('/admin/reports'),
@@ -101,8 +108,13 @@ export default function AdminPanel() {
         api.get('/events'),
         api.get('/settings'),
       ]);
-      setUsers(u.data); setApprovals(a.data); setCoordinators(c.data);
+      setUsers(u.data); setJobs(j.data); setApprovals(a.data); setCoordinators(c.data);
       setReports(r.data); setAlbums(al.data); setEvents(ev.data); setSettings(s.data);
+      setBrandingText({
+        linkedinUrl: s.data.linkedinUrl || '',
+        seekerWhatsappUrl: s.data.seekerWhatsappUrl || '',
+        employerWhatsappUrl: s.data.employerWhatsappUrl || '',
+      });
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
   }, []);
@@ -145,6 +157,17 @@ export default function AdminPanel() {
     setEditApprovalJob(null); loadAll();
   };
 
+  // ---------- Jobs ----------
+  const saveJob = async (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const payload = Object.fromEntries(f.entries());
+    if (jobModal.id) await api.put(`/admin/jobs/${jobModal.id}`, payload);
+    else await api.post('/admin/jobs', payload);
+    setJobModal(null); loadAll();
+  };
+  const removeJob = async (id) => { if (!confirm('Delete this job permanently?')) return; await api.delete(`/admin/jobs/${id}`); loadAll(); };
+
   // ---------- Albums ----------
   const saveAlbum = async (e) => {
     e.preventDefault();
@@ -178,6 +201,23 @@ export default function AdminPanel() {
     const form = new FormData();
     form.append(field, file);
     const { data } = await api.put('/admin/settings', form);
+    setSettings(data);
+  };
+  const saveBrandingText = async (field) => {
+    const form = new FormData();
+    form.append(field, brandingText[field]);
+    const { data } = await api.put('/admin/settings', form);
+    setSettings(data);
+  };
+  const uploadBarcode = async (field, file) => {
+    if (!file) return;
+    const form = new FormData();
+    form.append(field, file);
+    const { data } = await api.put('/admin/settings', form);
+    setSettings(data);
+  };
+  const deleteBarcode = async (which) => {
+    const { data } = await api.delete(`/admin/settings/${which}-barcode`);
     setSettings(data);
   };
 
@@ -287,6 +327,35 @@ export default function AdminPanel() {
                   </div>
                 ))}
                 {users.length === 0 && <p style={{ padding:'18px', color:'#888', fontSize:'13px' }}>No users yet.</p>}
+              </div>
+            </>
+          )}
+
+          {tab === 'jobs' && (
+            <>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'14px' }}>
+                <h2 style={{ fontWeight:700, fontSize:'17px', color:'#1a1a1a' }}>All Jobs</h2>
+                <div style={{ display:'flex', gap:'8px' }}>
+                  <ExportButton onClick={() => exportToExcel('jobs', jobs.map(j => ({ Title:j.title, Company:j.company, Type:j.type, Category:j.category, Status:j.approvalStatus, Active:j.isActive, PostedBy:j.recruiter?.fullName || j.coordinator?.fullName || '' })))} />
+                  <button onClick={() => setJobModal({})} style={btnPrimary}>+ Post New Job</button>
+                </div>
+              </div>
+              <p style={{ color:'#666', fontSize:'13px', marginBottom:'14px' }}>Admin has full edit and delete access across every job, regardless of who posted it.</p>
+              <div className="admin-card" style={{ overflow:'hidden' }}>
+                {jobs.map((j, i) => (
+                  <div key={j.id} className="admin-table-row" style={{ display:'flex', flexWrap:'wrap', justifyContent:'space-between', alignItems:'center', gap:'10px', padding:'14px 18px', borderBottom: i < jobs.length-1 ? '1px solid #f0f0f5' : 'none' }}>
+                    <div>
+                      <p style={{ fontWeight:600, color:'#1a1a1a', fontSize:'14px' }}>{j.title}</p>
+                      <p style={{ color:'#777', fontSize:'12.5px' }}>{j.company} · {j.location} · {j.type} · Posted by {j.recruiter?.fullName || j.coordinator?.fullName || 'Unknown'}</p>
+                    </div>
+                    <div style={{ display:'flex', alignItems:'center', gap:'8px', flexWrap:'wrap' }}>
+                      <StatusPill status={j.approvalStatus} />
+                      <button onClick={() => setJobModal({ ...j })} style={{ background:'#fff', color:GOLD, fontSize:'12px', fontWeight:600, padding:'5px 12px', borderRadius:'12px', border:`1px solid ${GOLD}`, cursor:'pointer' }}>Edit</button>
+                      <button onClick={() => removeJob(j.id)} style={{ background:'#fff', color:RED, fontSize:'12px', fontWeight:600, padding:'5px 12px', borderRadius:'12px', border:`1px solid ${RED}`, cursor:'pointer' }}>Delete</button>
+                    </div>
+                  </div>
+                ))}
+                {jobs.length === 0 && <p style={{ padding:'18px', color:'#888', fontSize:'13px' }}>No jobs posted yet.</p>}
               </div>
             </>
           )}
@@ -528,8 +597,52 @@ export default function AdminPanel() {
                     <input type="file" accept="image/*" style={{ display:'none' }} onChange={e => uploadLogo('footerLogo', e.target.files[0])} />
                   </label>
                 </div>
+
+                <div className="admin-card" style={{ padding:'20px', gridColumn:'span 6' }}>
+                  <p style={{ fontWeight:600, color:'#1a1a1a', fontSize:'14px', marginBottom:'10px' }}>LinkedIn Page URL</p>
+                  <div style={{ display:'flex', gap:'8px', flexWrap:'wrap' }}>
+                    <input style={{ ...inp, flex:'1 1 260px', marginBottom:0 }} placeholder="https://linkedin.com/company/iipa-jobs"
+                      value={brandingText.linkedinUrl} onChange={e => setBrandingText(b => ({ ...b, linkedinUrl:e.target.value }))} />
+                    <button onClick={() => saveBrandingText('linkedinUrl')} style={btnPrimary}>Save</button>
+                  </div>
+                  <p style={{ color:'#888', fontSize:'12px', marginTop:'8px' }}>Shown as a link in the footer. Leave blank to hide it.</p>
+                </div>
+
+                <div className="admin-card" style={{ padding:'20px', gridColumn:'span 3' }}>
+                  <p style={{ fontWeight:600, color:'#1a1a1a', fontSize:'14px', marginBottom:'10px' }}>Job Seekers WhatsApp Group Barcode</p>
+                  <div style={{ width:'120px', height:'120px', border: settings.seekerBarcodeUrl ? 'none' : '2px dashed #d6d6ee', borderRadius:'10px', display:'flex', alignItems:'center', justifyContent:'center', color:'#999', fontSize:'12px', marginBottom:'10px', overflow:'hidden' }}>
+                    {settings.seekerBarcodeUrl ? <img src={settings.seekerBarcodeUrl} alt="Seeker barcode" style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : 'No barcode uploaded'}
+                  </div>
+                  <input style={{ ...inp }} placeholder="WhatsApp group link" value={brandingText.seekerWhatsappUrl} onChange={e => setBrandingText(b => ({ ...b, seekerWhatsappUrl:e.target.value }))} />
+                  <div style={{ display:'flex', gap:'8px', flexWrap:'wrap' }}>
+                    <label style={{ ...btnPrimary, display:'inline-block', cursor:'pointer', fontSize:'12px', padding:'7px 14px' }}>
+                      Upload
+                      <input type="file" accept="image/*" style={{ display:'none' }} onChange={e => uploadBarcode('seekerBarcode', e.target.files[0])} />
+                    </label>
+                    <button onClick={() => saveBrandingText('seekerWhatsappUrl')} style={{ ...btnPrimary, fontSize:'12px', padding:'7px 14px', background:'#fff', color:INDIGO, border:`1px solid ${INDIGO}` }}>Save Link</button>
+                    {settings.seekerBarcodeUrl && <button onClick={() => deleteBarcode('seeker')} style={{ background:'#fff', color:RED, border:`1px solid ${RED}`, fontSize:'12px', fontWeight:600, padding:'7px 14px', borderRadius:'16px', cursor:'pointer' }}>Remove</button>}
+                  </div>
+                  <p style={{ color:'#888', fontSize:'11.5px', marginTop:'6px' }}>Visible only to logged-in job seekers.</p>
+                </div>
+
+                <div className="admin-card" style={{ padding:'20px', gridColumn:'span 3' }}>
+                  <p style={{ fontWeight:600, color:'#1a1a1a', fontSize:'14px', marginBottom:'10px' }}>Recruiter WhatsApp Group Barcode</p>
+                  <div style={{ width:'120px', height:'120px', border: settings.employerBarcodeUrl ? 'none' : '2px dashed #d6d6ee', borderRadius:'10px', display:'flex', alignItems:'center', justifyContent:'center', color:'#999', fontSize:'12px', marginBottom:'10px', overflow:'hidden' }}>
+                    {settings.employerBarcodeUrl ? <img src={settings.employerBarcodeUrl} alt="Employer barcode" style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : 'No barcode uploaded'}
+                  </div>
+                  <input style={{ ...inp }} placeholder="WhatsApp group link" value={brandingText.employerWhatsappUrl} onChange={e => setBrandingText(b => ({ ...b, employerWhatsappUrl:e.target.value }))} />
+                  <div style={{ display:'flex', gap:'8px', flexWrap:'wrap' }}>
+                    <label style={{ ...btnPrimary, display:'inline-block', cursor:'pointer', fontSize:'12px', padding:'7px 14px' }}>
+                      Upload
+                      <input type="file" accept="image/*" style={{ display:'none' }} onChange={e => uploadBarcode('employerBarcode', e.target.files[0])} />
+                    </label>
+                    <button onClick={() => saveBrandingText('employerWhatsappUrl')} style={{ ...btnPrimary, fontSize:'12px', padding:'7px 14px', background:'#fff', color:INDIGO, border:`1px solid ${INDIGO}` }}>Save Link</button>
+                    {settings.employerBarcodeUrl && <button onClick={() => deleteBarcode('employer')} style={{ background:'#fff', color:RED, border:`1px solid ${RED}`, fontSize:'12px', fontWeight:600, padding:'7px 14px', borderRadius:'16px', cursor:'pointer' }}>Remove</button>}
+                  </div>
+                  <p style={{ color:'#888', fontSize:'11.5px', marginTop:'6px' }}>Visible only to logged-in, registered employers (recruiters).</p>
+                </div>
               </div>
-              <p style={{ color:'#888', fontSize:'12.5px', marginTop:'14px' }}>Only Admin users can change branding. Changes apply immediately on the header and footer across the site.</p>
+              <p style={{ color:'#888', fontSize:'12.5px', marginTop:'14px' }}>Only Admin users can change branding. Changes apply immediately across the site.</p>
             </>
           )}
         </main>
@@ -550,6 +663,34 @@ export default function AdminPanel() {
               <input type="checkbox" checked={!!editUser.isActive} onChange={e => setEditUser({ ...editUser, isActive:e.target.checked })} /> Active
             </label>
             <button type="submit" style={{ ...btnPrimary, width:'100%' }}>Save Changes</button>
+          </form>
+        </Modal>
+      )}
+
+      {jobModal && (
+        <Modal title={jobModal.id ? 'Edit Job' : 'Post New Job'} onClose={() => setJobModal(null)}>
+          <form onSubmit={saveJob}>
+            <label style={{ fontSize:'12.5px', color:'#555' }}>Job Title</label>
+            <input name="title" defaultValue={jobModal.title} required style={inp} placeholder="e.g. Senior React Developer" />
+            <label style={{ fontSize:'12.5px', color:'#555' }}>Company</label>
+            <input name="company" defaultValue={jobModal.company} required style={inp} />
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px' }}>
+              <div>
+                <label style={{ fontSize:'12.5px', color:'#555' }}>Location</label>
+                <input name="location" defaultValue={jobModal.location} style={inp} />
+              </div>
+              <div>
+                <label style={{ fontSize:'12.5px', color:'#555' }}>Type</label>
+                <select name="type" defaultValue={jobModal.type || 'full-time'} style={inp}>
+                  {JOB_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+            </div>
+            <label style={{ fontSize:'12.5px', color:'#555' }}>Category</label>
+            <input name="category" defaultValue={jobModal.category} style={inp} placeholder="e.g. Technology" />
+            <label style={{ fontSize:'12.5px', color:'#555' }}>Description</label>
+            <textarea name="description" defaultValue={jobModal.description} rows={4} style={{ ...inp, resize:'none' }} />
+            <button type="submit" style={{ ...btnPrimary, width:'100%' }}>{jobModal.id ? 'Save Changes' : 'Post Job'}</button>
           </form>
         </Modal>
       )}

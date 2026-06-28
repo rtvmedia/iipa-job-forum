@@ -22,4 +22,15 @@ const upload = multer({
   },
 });
 
+const uploadResume = multer({
+  storage,
+  limits: { fileSize: 8 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const ok = /^application\/(pdf|msword|vnd\.openxmlformats-officedocument\.wordprocessingml\.document)$/.test(file.mimetype);
+    if (ok) cb(null, true);
+    else cb(new Error('Only PDF or Word documents are allowed'));
+  },
+});
+
 module.exports = upload;
+module.exports.uploadResume = uploadResume;

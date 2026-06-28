@@ -243,10 +243,71 @@ const updateSettings = async (req, res) => {
     let settings = await SiteSetting.findOne();
     if (!settings) settings = await SiteSetting.create({});
     const updates = {};
-    if (req.files?.headerLogo?.[0]) updates.headerLogoUrl = `/uploads/${req.files.headerLogo[0].filename}`;
-    if (req.files?.footerLogo?.[0]) updates.footerLogoUrl = `/uploads/${req.files.footerLogo[0].filename}`;
+    if (req.files?.headerLogo?.[0])        updates.headerLogoUrl        = `/uploads/${req.files.headerLogo[0].filename}`;
+    if (req.files?.footerLogo?.[0])        updates.footerLogoUrl        = `/uploads/${req.files.footerLogo[0].filename}`;
+    if (req.files?.seekerBarcode?.[0])     updates.seekerBarcodeUrl     = `/uploads/${req.files.seekerBarcode[0].filename}`;
+    if (req.files?.employerBarcode?.[0])   updates.employerBarcodeUrl   = `/uploads/${req.files.employerBarcode[0].filename}`;
+    if (req.body.linkedinUrl !== undefined)         updates.linkedinUrl         = req.body.linkedinUrl;
+    if (req.body.seekerWhatsappUrl !== undefined)   updates.seekerWhatsappUrl   = req.body.seekerWhatsappUrl;
+    if (req.body.employerWhatsappUrl !== undefined) updates.employerWhatsappUrl = req.body.employerWhatsappUrl;
     await settings.update(updates);
     res.json(settings);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
+const deleteSeekerBarcode   = async (req, res) => {
+  const settings = await SiteSetting.findOne();
+  await settings.update({ seekerBarcodeUrl: null });
+  res.json(settings);
+};
+const deleteEmployerBarcode = async (req, res) => {
+  const settings = await SiteSetting.findOne();
+  await settings.update({ employerBarcodeUrl: null });
+  res.json(settings);
+};
+
+// ---------- Jobs (full admin CRUD across all recruiters/coordinators) ----------
+const getAllJobsAdmin = async (req, res) => {
+  try {
+    const jobs = await Job.findAll({
+      include: [
+        { model: User, as: 'recruiter', attributes: ['fullName', 'email'] },
+        { model: User, as: 'coordinator', attributes: ['fullName', 'email'] },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
+    res.json(jobs);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
+const createJobAdmin = async (req, res) => {
+  try {
+    const { title, company, location, type, category, description, requirements, salaryMin, salaryMax, deadline } = req.body;
+    const job = await Job.create({
+      recruiterId: req.user.id,
+      title, company, location, type: type || 'full-time', category,
+      description, requirements, salaryMin, salaryMax, deadline,
+      approvalStatus: 'approved', isActive: true,
+    });
+    res.status(201).json(job);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
+const updateJobAdmin = async (req, res) => {
+  try {
+    const job = await Job.findByPk(req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    await job.update(req.body);
+    res.json(job);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
+const deleteJobAdmin = async (req, res) => {
+  try {
+    const job = await Job.findByPk(req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    await job.destroy();
+    res.json({ message: 'Job deleted' });
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
 
@@ -256,5 +317,6 @@ module.exports = {
   getCoordinators,
   getReports,
   getAlbums, createAlbum, updateAlbum, deleteAlbum, addAlbumImage, deleteAlbumImage,
-  getSettings, updateSettings,
+  getSettings, updateSettings, deleteSeekerBarcode, deleteEmployerBarcode,
+  getAllJobsAdmin, createJobAdmin, updateJobAdmin, deleteJobAdmin,
 };
