@@ -196,10 +196,12 @@ export default function AdminPanel() {
   };
 
   // ---------- Branding ----------
-  const [brandingError, setBrandingError] = useState('');
+  const [brandingError, setBrandingError]   = useState('');
+  const [uploadingField, setUploadingField] = useState('');
   const uploadLogo = async (field, file) => {
     if (!file) return;
     setBrandingError('');
+    setUploadingField(field);
     try {
       const form = new FormData();
       form.append(field, file);
@@ -207,6 +209,8 @@ export default function AdminPanel() {
       setSettings(data);
     } catch (err) {
       setBrandingError(err.response?.data?.message || 'Upload failed. Please try a different image.');
+    } finally {
+      setUploadingField('');
     }
   };
   const saveBrandingText = async (field) => {
@@ -223,6 +227,7 @@ export default function AdminPanel() {
   const uploadBarcode = async (field, file) => {
     if (!file) return;
     setBrandingError('');
+    setUploadingField(field);
     try {
       const form = new FormData();
       form.append(field, file);
@@ -230,10 +235,16 @@ export default function AdminPanel() {
       setSettings(data);
     } catch (err) {
       setBrandingError(err.response?.data?.message || 'Upload failed. Please try a different image.');
+    } finally {
+      setUploadingField('');
     }
   };
   const deleteBarcode = async (which) => {
     const { data } = await api.delete(`/admin/settings/${which}-barcode`);
+    setSettings(data);
+  };
+  const deleteLogo = async (which) => {
+    const { data } = await api.delete(`/admin/settings/${which}-logo`);
     setSettings(data);
   };
 
@@ -597,26 +608,33 @@ export default function AdminPanel() {
                   ⚠ {brandingError}
                 </div>
               )}
+              <p style={{ color:'#888', fontSize:'12.5px', marginBottom:'14px' }}>Logos and barcodes must be under 600KB — compress/resize the image first if your file is larger.</p>
               <div className="admin-grid">
                 <div className="admin-card" style={{ padding:'20px', gridColumn:'span 3' }}>
                   <p style={{ fontWeight:600, color:'#1a1a1a', fontSize:'14px', marginBottom:'10px' }}>Header Logo</p>
                   <div style={{ width:'100%', height:'90px', border: settings.headerLogoUrl ? 'none' : '2px dashed #d6d6ee', borderRadius:'10px', display:'flex', alignItems:'center', justifyContent:'center', color:'#999', fontSize:'13px', marginBottom:'10px', overflow:'hidden' }}>
                     {settings.headerLogoUrl ? <img src={settings.headerLogoUrl} alt="Header logo" style={{ maxHeight:'90px', maxWidth:'100%' }} /> : 'No logo uploaded — defaults to "IIPA JOBS" text'}
                   </div>
-                  <label style={{ ...btnPrimary, display:'inline-block', cursor:'pointer' }}>
-                    Upload Header Logo
-                    <input type="file" accept="image/*" style={{ display:'none' }} onChange={e => uploadLogo('headerLogo', e.target.files[0])} />
-                  </label>
+                  <div style={{ display:'flex', gap:'8px', flexWrap:'wrap' }}>
+                    <label style={{ ...btnPrimary, display:'inline-block', cursor:'pointer', opacity: uploadingField==='headerLogo' ? 0.6 : 1 }}>
+                      {uploadingField==='headerLogo' ? 'Uploading…' : 'Upload Header Logo'}
+                      <input type="file" accept="image/*" disabled={uploadingField==='headerLogo'} style={{ display:'none' }} onChange={e => uploadLogo('headerLogo', e.target.files[0])} />
+                    </label>
+                    {settings.headerLogoUrl && <button onClick={() => deleteLogo('header')} style={{ background:'#fff', color:RED, border:`1px solid ${RED}`, fontSize:'13px', fontWeight:600, padding:'9px 16px', borderRadius:'16px', cursor:'pointer' }}>Remove</button>}
+                  </div>
                 </div>
                 <div className="admin-card" style={{ padding:'20px', gridColumn:'span 3' }}>
                   <p style={{ fontWeight:600, color:'#1a1a1a', fontSize:'14px', marginBottom:'10px' }}>Footer Logo</p>
                   <div style={{ width:'100%', height:'90px', border: settings.footerLogoUrl ? 'none' : '2px dashed #d6d6ee', borderRadius:'10px', display:'flex', alignItems:'center', justifyContent:'center', color:'#999', fontSize:'13px', marginBottom:'10px', overflow:'hidden' }}>
                     {settings.footerLogoUrl ? <img src={settings.footerLogoUrl} alt="Footer logo" style={{ maxHeight:'90px', maxWidth:'100%' }} /> : 'No logo uploaded — defaults to "IIPA JOBS" text'}
                   </div>
-                  <label style={{ ...btnPrimary, display:'inline-block', cursor:'pointer' }}>
-                    Upload Footer Logo
-                    <input type="file" accept="image/*" style={{ display:'none' }} onChange={e => uploadLogo('footerLogo', e.target.files[0])} />
-                  </label>
+                  <div style={{ display:'flex', gap:'8px', flexWrap:'wrap' }}>
+                    <label style={{ ...btnPrimary, display:'inline-block', cursor:'pointer', opacity: uploadingField==='footerLogo' ? 0.6 : 1 }}>
+                      {uploadingField==='footerLogo' ? 'Uploading…' : 'Upload Footer Logo'}
+                      <input type="file" accept="image/*" disabled={uploadingField==='footerLogo'} style={{ display:'none' }} onChange={e => uploadLogo('footerLogo', e.target.files[0])} />
+                    </label>
+                    {settings.footerLogoUrl && <button onClick={() => deleteLogo('footer')} style={{ background:'#fff', color:RED, border:`1px solid ${RED}`, fontSize:'13px', fontWeight:600, padding:'9px 16px', borderRadius:'16px', cursor:'pointer' }}>Remove</button>}
+                  </div>
                 </div>
 
                 <div className="admin-card" style={{ padding:'20px', gridColumn:'span 6' }}>
@@ -636,9 +654,9 @@ export default function AdminPanel() {
                   </div>
                   <input style={{ ...inp }} placeholder="WhatsApp group link" value={brandingText.seekerWhatsappUrl} onChange={e => setBrandingText(b => ({ ...b, seekerWhatsappUrl:e.target.value }))} />
                   <div style={{ display:'flex', gap:'8px', flexWrap:'wrap' }}>
-                    <label style={{ ...btnPrimary, display:'inline-block', cursor:'pointer', fontSize:'12px', padding:'7px 14px' }}>
-                      Upload
-                      <input type="file" accept="image/*" style={{ display:'none' }} onChange={e => uploadBarcode('seekerBarcode', e.target.files[0])} />
+                    <label style={{ ...btnPrimary, display:'inline-block', cursor:'pointer', fontSize:'12px', padding:'7px 14px', opacity: uploadingField==='seekerBarcode' ? 0.6 : 1 }}>
+                      {uploadingField==='seekerBarcode' ? 'Uploading…' : 'Upload'}
+                      <input type="file" accept="image/*" disabled={uploadingField==='seekerBarcode'} style={{ display:'none' }} onChange={e => uploadBarcode('seekerBarcode', e.target.files[0])} />
                     </label>
                     <button onClick={() => saveBrandingText('seekerWhatsappUrl')} style={{ ...btnPrimary, fontSize:'12px', padding:'7px 14px', background:'#fff', color:INDIGO, border:`1px solid ${INDIGO}` }}>Save Link</button>
                     {settings.seekerBarcodeUrl && <button onClick={() => deleteBarcode('seeker')} style={{ background:'#fff', color:RED, border:`1px solid ${RED}`, fontSize:'12px', fontWeight:600, padding:'7px 14px', borderRadius:'16px', cursor:'pointer' }}>Remove</button>}
@@ -653,9 +671,9 @@ export default function AdminPanel() {
                   </div>
                   <input style={{ ...inp }} placeholder="WhatsApp group link" value={brandingText.employerWhatsappUrl} onChange={e => setBrandingText(b => ({ ...b, employerWhatsappUrl:e.target.value }))} />
                   <div style={{ display:'flex', gap:'8px', flexWrap:'wrap' }}>
-                    <label style={{ ...btnPrimary, display:'inline-block', cursor:'pointer', fontSize:'12px', padding:'7px 14px' }}>
-                      Upload
-                      <input type="file" accept="image/*" style={{ display:'none' }} onChange={e => uploadBarcode('employerBarcode', e.target.files[0])} />
+                    <label style={{ ...btnPrimary, display:'inline-block', cursor:'pointer', fontSize:'12px', padding:'7px 14px', opacity: uploadingField==='employerBarcode' ? 0.6 : 1 }}>
+                      {uploadingField==='employerBarcode' ? 'Uploading…' : 'Upload'}
+                      <input type="file" accept="image/*" disabled={uploadingField==='employerBarcode'} style={{ display:'none' }} onChange={e => uploadBarcode('employerBarcode', e.target.files[0])} />
                     </label>
                     <button onClick={() => saveBrandingText('employerWhatsappUrl')} style={{ ...btnPrimary, fontSize:'12px', padding:'7px 14px', background:'#fff', color:INDIGO, border:`1px solid ${INDIGO}` }}>Save Link</button>
                     {settings.employerBarcodeUrl && <button onClick={() => deleteBarcode('employer')} style={{ background:'#fff', color:RED, border:`1px solid ${RED}`, fontSize:'12px', fontWeight:600, padding:'7px 14px', borderRadius:'16px', cursor:'pointer' }}>Remove</button>}

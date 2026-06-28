@@ -37,6 +37,8 @@ router.put('/settings', upload.uploadMemory.fields([
 ]), ctrl.updateSettings);
 router.delete('/settings/seeker-barcode',   ctrl.deleteSeekerBarcode);
 router.delete('/settings/employer-barcode', ctrl.deleteEmployerBarcode);
+router.delete('/settings/header-logo',      ctrl.deleteHeaderLogo);
+router.delete('/settings/footer-logo',      ctrl.deleteFooterLogo);
 
 router.get('/jobs',           ctrl.getAllJobsAdmin);
 router.post('/jobs',          ctrl.createJobAdmin);

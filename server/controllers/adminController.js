@@ -266,6 +266,16 @@ const deleteEmployerBarcode = async (req, res) => {
   await settings.update({ employerBarcodeUrl: null });
   res.json(settings);
 };
+const deleteHeaderLogo = async (req, res) => {
+  const settings = await SiteSetting.findOne();
+  await settings.update({ headerLogoUrl: null });
+  res.json(settings);
+};
+const deleteFooterLogo = async (req, res) => {
+  const settings = await SiteSetting.findOne();
+  await settings.update({ footerLogoUrl: null });
+  res.json(settings);
+};
 
 // ---------- Jobs (full admin CRUD across all recruiters/coordinators) ----------
 const getAllJobsAdmin = async (req, res) => {
@@ -318,6 +328,6 @@ module.exports = {
   getCoordinators,
   getReports,
   getAlbums, createAlbum, updateAlbum, deleteAlbum, addAlbumImage, deleteAlbumImage,
-  getSettings, updateSettings, deleteSeekerBarcode, deleteEmployerBarcode,
+  getSettings, updateSettings, deleteSeekerBarcode, deleteEmployerBarcode, deleteHeaderLogo, deleteFooterLogo,
   getAllJobsAdmin, createJobAdmin, updateJobAdmin, deleteJobAdmin,
 };

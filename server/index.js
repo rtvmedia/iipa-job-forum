@@ -54,7 +54,7 @@ if (isProd) {
 // the frontend's error handling.
 app.use((err, req, res, next) => {
   if (err?.name === 'MulterError') {
-    const message = err.code === 'LIMIT_FILE_SIZE' ? 'File is too large.' : err.message;
+    const message = err.code === 'LIMIT_FILE_SIZE' ? 'File is too large. Please use an image under 600KB (resize/compress it first).' : err.message;
     return res.status(400).json({ message });
   }
   if (err) {

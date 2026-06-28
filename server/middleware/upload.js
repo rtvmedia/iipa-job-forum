@@ -37,7 +37,7 @@ const uploadResume = multer({
 // persist across Hostinger redeploys (uploaded files in server/uploads get wiped).
 const uploadMemory = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 4 * 1024 * 1024 },
+  limits: { fileSize: 600 * 1024 },
   fileFilter: (req, file, cb) => {
     if (/^image\/(jpeg|png|webp|gif|svg\+xml)$/.test(file.mimetype)) cb(null, true);
     else cb(new Error('Only image files (JPG, PNG, WEBP, GIF, SVG) are allowed'));
