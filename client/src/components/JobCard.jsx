@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useSavedJobs } from '../context/SavedJobsContext';
 
 const TYPE_COLORS = {
   'full-time':  { bg:'#e8f1fb', color:'#0a66c2' },
@@ -9,10 +11,13 @@ const TYPE_COLORS = {
 };
 
 export default function JobCard({ job }) {
+  const { user } = useAuth();
+  const savedCtx = useSavedJobs();
   const salary = job.salaryMin
     ? `₹ ${(job.salaryMin/1000).toFixed(0)}k – ${(job.salaryMax/1000).toFixed(0)}k`
     : 'Salary not disclosed';
   const tc = TYPE_COLORS[job.type] || { bg:'#f5f5f5', color:'#444' };
+  const isSaved = savedCtx?.savedIds?.has(job.id);
 
   return (
     <div style={{ background:'#fff', borderRadius:'8px', border:'1px solid #e0e0e0', padding:'16px', transition:'box-shadow 0.15s' }}
@@ -27,9 +32,17 @@ export default function JobCard({ job }) {
           </Link>
           <p style={{ color:'#555', fontSize:'13px', marginTop:'2px' }}>{job.company}</p>
         </div>
-        <span style={{ background:tc.bg, color:tc.color, fontSize:'11px', fontWeight:600, padding:'3px 10px', borderRadius:'12px', whiteSpace:'nowrap', textTransform:'capitalize' }}>
-          {job.type}
-        </span>
+        <div style={{ display:'flex', alignItems:'center', gap:'8px', flexShrink:0 }}>
+          {user?.role === 'seeker' && (
+            <button onClick={() => savedCtx?.toggleSave(job.id)} title={isSaved ? 'Unsave job' : 'Save job'}
+              style={{ background:'none', border:'none', cursor:'pointer', fontSize:'17px', padding:0, lineHeight:1, color: isSaved ? '#d97706' : '#bbb' }}>
+              {isSaved ? '★' : '☆'}
+            </button>
+          )}
+          <span style={{ background:tc.bg, color:tc.color, fontSize:'11px', fontWeight:600, padding:'3px 10px', borderRadius:'12px', whiteSpace:'nowrap', textTransform:'capitalize' }}>
+            {job.type}
+          </span>
+        </div>
       </div>
 
       <div style={{ display:'flex', flexWrap:'wrap', gap:'12px', fontSize:'13px', color:'#666', marginBottom:'10px' }}>

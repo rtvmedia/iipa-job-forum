@@ -20,6 +20,23 @@ const User = sequelize.define('User', {
   companyWebsite:  { type: DataTypes.STRING(200) },
   companyIndustry: { type: DataTypes.STRING(100) },
   companyAbout:    { type: DataTypes.TEXT },
+
+  // Seeker profile depth
+  currentJobTitle:    { type: DataTypes.STRING(150) },
+  yearsOfExperience:  { type: DataTypes.STRING(20) },
+  willingToRelocate:  { type: DataTypes.BOOLEAN, defaultValue: false },
+  visaStatus:         { type: DataTypes.STRING(100) },
+  skills:              { type: DataTypes.TEXT },          // comma-separated
+  languages:           { type: DataTypes.TEXT },          // JSON string: [{language,reading,writing,speaking,proficiency}]
+  websiteUrl:          { type: DataTypes.STRING(300) },
+  linkedinProfile:     { type: DataTypes.STRING(300) },
+  githubProfile:       { type: DataTypes.STRING(300) },
+  portfolioUrl:        { type: DataTypes.STRING(300) },
+  desiredJobTitle:     { type: DataTypes.STRING(150) },
+  preferredLocations:  { type: DataTypes.STRING(300) },
+  salaryExpectation:   { type: DataTypes.STRING(100) },
+  noticePeriod:        { type: DataTypes.STRING(60) },
+  workMode:            { type: DataTypes.STRING(30) },     // remote / hybrid / onsite
 }, { tableName: 'users', timestamps: true });
 
 module.exports = User;

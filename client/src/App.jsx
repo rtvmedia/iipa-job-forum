@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { SavedJobsProvider } from './context/SavedJobsContext';
 import Navbar       from './components/Navbar';
 import Footer       from './components/Footer';
 import AIAssistant  from './components/AIAssistant';
@@ -103,7 +104,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
+        <SavedJobsProvider>
+          <AppRoutes />
+        </SavedJobsProvider>
       </AuthProvider>
     </BrowserRouter>
   );

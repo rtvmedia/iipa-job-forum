@@ -30,6 +30,7 @@ app.use('/api/events',       require('./routes/events'));
 app.use('/api/admin',        require('./routes/admin'));
 app.use('/api/coordinator',  require('./routes/coordinator'));
 app.use('/api/settings',     require('./routes/settings'));
+app.use('/api/seeker',       require('./routes/seeker'));
 
 app.get('/api/health', (_, res) => res.json({
   status: 'ok',

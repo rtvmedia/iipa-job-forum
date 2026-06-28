@@ -7,6 +7,10 @@ const Event       = require('./Event');
 const Album       = require('./Album');
 const AlbumImage  = require('./AlbumImage');
 const SiteSetting = require('./SiteSetting');
+const WorkExperience = require('./WorkExperience');
+const Education      = require('./Education');
+const Certification  = require('./Certification');
+const SavedJob       = require('./SavedJob');
 
 // Associations
 User.hasMany(Job,         { foreignKey: 'recruiterId', as: 'postedJobs' });
@@ -27,4 +31,21 @@ Album.belongsTo(Event,     { foreignKey: 'eventId',    as: 'event' });
 Album.hasMany(AlbumImage,  { foreignKey: 'albumId',    as: 'images' });
 AlbumImage.belongsTo(Album,{ foreignKey: 'albumId',    as: 'album' });
 
-module.exports = { sequelize, User, Job, Application, NewsPost, Event, Album, AlbumImage, SiteSetting };
+User.hasMany(WorkExperience, { foreignKey: 'userId', as: 'workExperiences' });
+WorkExperience.belongsTo(User, { foreignKey: 'userId' });
+
+User.hasMany(Education,    { foreignKey: 'userId', as: 'educations' });
+Education.belongsTo(User,  { foreignKey: 'userId' });
+
+User.hasMany(Certification,   { foreignKey: 'userId', as: 'certifications' });
+Certification.belongsTo(User, { foreignKey: 'userId' });
+
+User.hasMany(SavedJob,     { foreignKey: 'userId', as: 'savedJobs' });
+SavedJob.belongsTo(User,   { foreignKey: 'userId' });
+Job.hasMany(SavedJob,      { foreignKey: 'jobId',  as: 'savedBy' });
+SavedJob.belongsTo(Job,    { foreignKey: 'jobId',  as: 'job' });
+
+module.exports = {
+  sequelize, User, Job, Application, NewsPost, Event, Album, AlbumImage, SiteSetting,
+  WorkExperience, Education, Certification, SavedJob,
+};

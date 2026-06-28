@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
+import { useSavedJobs } from '../../context/SavedJobsContext';
 
 const BLUE = '#0a66c2';
 
@@ -15,6 +16,7 @@ const STATUS_STYLES = {
 
 export default function SeekerDashboard() {
   const { user } = useAuth();
+  const savedCtx = useSavedJobs();
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -103,6 +105,36 @@ export default function SeekerDashboard() {
                 </div>
               );
             })}
+          </div>
+        )}
+      </div>
+
+      {/* Saved Jobs */}
+      <div style={{ background:'#fff', borderRadius:'8px', border:'1px solid #e0e0e0', marginTop:'20px' }}>
+        <div style={{ padding:'16px 20px', borderBottom:'1px solid #e8e8e8' }}>
+          <h2 style={{ fontWeight:700, color:'#1a1a1a', fontSize:'16px' }}>Saved Jobs</h2>
+        </div>
+        {!savedCtx?.savedJobs?.length ? (
+          <div style={{ textAlign:'center', padding:'32px 16px' }}>
+            <p style={{ color:'#666', fontSize:'14px' }}>You haven't saved any jobs yet.</p>
+          </div>
+        ) : (
+          <div>
+            {savedCtx.savedJobs.map((job, i) => (
+              <div key={job.id} style={{ padding:'14px 20px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:'12px', borderBottom: i < savedCtx.savedJobs.length-1 ? '1px solid #f0f0f0' : 'none' }}>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <Link to={`/jobs/${job.id}`} style={{ fontWeight:600, color:BLUE, fontSize:'14px', display:'block', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                    {job.title}
+                  </Link>
+                  <p style={{ color:'#555', fontSize:'13px', marginTop:'2px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                    {job.company} · {job.location}
+                  </p>
+                </div>
+                <button onClick={() => savedCtx.toggleSave(job.id)} style={{ background:'#fff', color:'#d97706', border:'1px solid #d97706', fontSize:'12px', fontWeight:600, padding:'5px 12px', borderRadius:'12px', cursor:'pointer', flexShrink:0 }}>
+                  Remove
+                </button>
+              </div>
+            ))}
           </div>
         )}
       </div>

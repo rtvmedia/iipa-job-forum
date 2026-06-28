@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
+import { useSavedJobs } from '../../context/SavedJobsContext';
 
 const BLUE = '#0a66c2';
 
 export default function JobDetail() {
   const { id } = useParams();
   const { user } = useAuth();
+  const savedCtx = useSavedJobs();
   const navigate = useNavigate();
   const [job, setJob]           = useState(null);
   const [loading, setLoading]   = useState(true);
@@ -36,6 +38,7 @@ export default function JobDetail() {
   if (loading) return <div style={{ textAlign:'center', padding:'60px', color:'#999' }}>Loading...</div>;
   if (!job)    return null;
 
+  const isSaved = savedCtx?.savedIds?.has(job.id);
   const salary = job.salaryMin ? `₹ ${(job.salaryMin/1000).toFixed(0)}k – ${(job.salaryMax/1000).toFixed(0)}k / month` : 'Not disclosed';
   const inp = { width:'100%', border:'1px solid #ddd', borderRadius:'6px', padding:'10px 12px', fontSize:'14px', outline:'none', boxSizing:'border-box', resize:'none' };
 
@@ -53,9 +56,17 @@ export default function JobDetail() {
               </h1>
               <p style={{ color:'rgba(255,255,255,0.75)', fontSize:'15px' }}>{job.company}</p>
             </div>
-            <span style={{ background:'rgba(255,255,255,0.15)', color:'white', fontSize:'12px', fontWeight:600, padding:'4px 12px', borderRadius:'12px', textTransform:'capitalize', whiteSpace:'nowrap' }}>
-              {job.type}
-            </span>
+            <div style={{ display:'flex', alignItems:'center', gap:'10px', flexShrink:0 }}>
+              {user?.role === 'seeker' && (
+                <button onClick={() => savedCtx?.toggleSave(job.id)} title={isSaved ? 'Unsave job' : 'Save job'}
+                  style={{ background:'rgba(255,255,255,0.15)', border:'none', borderRadius:'12px', cursor:'pointer', fontSize:'18px', padding:'4px 10px', lineHeight:1, color: isSaved ? '#FFC766' : '#fff' }}>
+                  {isSaved ? '★' : '☆'}
+                </button>
+              )}
+              <span style={{ background:'rgba(255,255,255,0.15)', color:'white', fontSize:'12px', fontWeight:600, padding:'4px 12px', borderRadius:'12px', textTransform:'capitalize', whiteSpace:'nowrap' }}>
+                {job.type}
+              </span>
+            </div>
           </div>
           <div style={{ display:'flex', flexWrap:'wrap', gap:'16px', marginTop:'14px', fontSize:'13px', color:'rgba(255,255,255,0.7)' }}>
             <span>📍 {job.location || 'India'}</span>

@@ -54,9 +54,19 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const { fullName, phone, location, headline, bio, companyName, companyWebsite, companyIndustry, companyAbout } = req.body;
+    const {
+      fullName, phone, location, headline, bio, companyName, companyWebsite, companyIndustry, companyAbout,
+      currentJobTitle, yearsOfExperience, willingToRelocate, visaStatus, nationality,
+      skills, languages, websiteUrl, linkedinProfile, githubProfile, portfolioUrl,
+      desiredJobTitle, preferredLocations, salaryExpectation, noticePeriod, workMode,
+    } = req.body;
     await User.update(
-      { fullName, phone, location, headline, bio, companyName, companyWebsite, companyIndustry, companyAbout },
+      {
+        fullName, phone, location, headline, bio, companyName, companyWebsite, companyIndustry, companyAbout,
+        currentJobTitle, yearsOfExperience, willingToRelocate, visaStatus, nationality,
+        skills, languages, websiteUrl, linkedinProfile, githubProfile, portfolioUrl,
+        desiredJobTitle, preferredLocations, salaryExpectation, noticePeriod, workMode,
+      },
       { where: { id: req.user.id } }
     );
     const updated = await User.findByPk(req.user.id, { attributes: { exclude: ['password'] } });
