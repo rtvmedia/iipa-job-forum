@@ -32,5 +32,21 @@ const uploadResume = multer({
   },
 });
 
+// In-memory upload for small branding assets (logos, barcodes) — stored as base64
+// directly in the database instead of on disk, since the local filesystem does not
+// persist across Hostinger redeploys (uploaded files in server/uploads get wiped).
+const uploadMemory = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 2 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (/^image\/(jpeg|png|webp|gif)$/.test(file.mimetype)) cb(null, true);
+    else cb(new Error('Only image files are allowed'));
+  },
+});
+
+const toDataUri = (file) => `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+
 module.exports = upload;
 module.exports.uploadResume = uploadResume;
+module.exports.uploadMemory = uploadMemory;
+module.exports.toDataUri = toDataUri;

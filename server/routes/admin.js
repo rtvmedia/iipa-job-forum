@@ -29,7 +29,7 @@ router.delete('/albums/:id',                   ctrl.deleteAlbum);
 router.post('/albums/:id/images',              upload.single('image'), ctrl.addAlbumImage);
 router.delete('/albums/:id/images/:imageId',   ctrl.deleteAlbumImage);
 
-router.put('/settings', upload.fields([
+router.put('/settings', upload.uploadMemory.fields([
   { name: 'headerLogo', maxCount: 1 },
   { name: 'footerLogo', maxCount: 1 },
   { name: 'seekerBarcode', maxCount: 1 },

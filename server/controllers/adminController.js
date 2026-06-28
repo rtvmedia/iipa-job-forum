@@ -240,13 +240,14 @@ const getSettings = async (req, res) => {
 
 const updateSettings = async (req, res) => {
   try {
+    const { toDataUri } = require('../middleware/upload');
     let settings = await SiteSetting.findOne();
     if (!settings) settings = await SiteSetting.create({});
     const updates = {};
-    if (req.files?.headerLogo?.[0])        updates.headerLogoUrl        = `/uploads/${req.files.headerLogo[0].filename}`;
-    if (req.files?.footerLogo?.[0])        updates.footerLogoUrl        = `/uploads/${req.files.footerLogo[0].filename}`;
-    if (req.files?.seekerBarcode?.[0])     updates.seekerBarcodeUrl     = `/uploads/${req.files.seekerBarcode[0].filename}`;
-    if (req.files?.employerBarcode?.[0])   updates.employerBarcodeUrl   = `/uploads/${req.files.employerBarcode[0].filename}`;
+    if (req.files?.headerLogo?.[0])        updates.headerLogoUrl        = toDataUri(req.files.headerLogo[0]);
+    if (req.files?.footerLogo?.[0])        updates.footerLogoUrl        = toDataUri(req.files.footerLogo[0]);
+    if (req.files?.seekerBarcode?.[0])     updates.seekerBarcodeUrl     = toDataUri(req.files.seekerBarcode[0]);
+    if (req.files?.employerBarcode?.[0])   updates.employerBarcodeUrl   = toDataUri(req.files.employerBarcode[0]);
     if (req.body.linkedinUrl !== undefined)         updates.linkedinUrl         = req.body.linkedinUrl;
     if (req.body.seekerWhatsappUrl !== undefined)   updates.seekerWhatsappUrl   = req.body.seekerWhatsappUrl;
     if (req.body.employerWhatsappUrl !== undefined) updates.employerWhatsappUrl = req.body.employerWhatsappUrl;
