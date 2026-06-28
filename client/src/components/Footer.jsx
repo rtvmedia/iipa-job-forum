@@ -18,19 +18,15 @@ export default function Footer() {
   return (
     <footer style={{ background:'#1a237e', color:'rgba(255,255,255,0.75)', marginTop:'auto' }}>
       <div className="tricolor" />
-      <div style={{ maxWidth:'1128px', margin:'0 auto', padding:'40px 16px 24px', display:'grid', gap:'32px', gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))' }}>
+      <div style={{ maxWidth:'1320px', margin:'0 auto', padding:'40px 16px 24px', display:'grid', gap:'32px', gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))' }}>
         <div>
           <div style={{ display:'flex', alignItems:'center', gap:'12px', marginBottom:'8px' }}>
             {logoUrl && (
               <span style={{ display:'flex', flexDirection:'column', alignItems:'center', flexShrink:0 }}>
-                <span style={{
-                  display:'flex', alignItems:'center', justifyContent:'center',
-                  width:'42px', height:'42px', borderRadius:'50%', background:'#fff',
-                  boxShadow:'0 2px 8px rgba(0,0,0,0.25)', border:'2px solid #FF9933',
-                  overflow:'hidden',
-                }}>
-                  <img src={logoUrl} alt="Logo" style={{ width:'42px', height:'42px', objectFit:'cover', borderRadius:'50%', display:'block' }} />
-                </span>
+                <img src={logoUrl} alt="Logo" style={{
+                  width:'48px', height:'48px', objectFit:'contain', display:'block',
+                  filter:'drop-shadow(0 2px 6px rgba(0,0,0,0.35))',
+                }} />
                 <span style={{ color:'rgba(255,255,255,0.55)', fontSize:'7px', fontWeight:600, lineHeight:1.2, textAlign:'center', marginTop:'2px' }}>
                   International Indian<br />Professionals Association
                 </span>

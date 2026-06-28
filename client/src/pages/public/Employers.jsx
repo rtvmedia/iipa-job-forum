@@ -16,7 +16,7 @@ export default function Employers() {
   return (
     <div>
       <style>{`
-        .emp-tabs { display:flex; gap:6px; border-bottom:1px solid #e0e0e0; max-width:1128px; margin:0 auto; padding:0 16px; }
+        .emp-tabs { display:flex; gap:6px; border-bottom:1px solid #e0e0e0; max-width:1320px; margin:0 auto; padding:0 16px; }
         .emp-tab { padding:14px 18px; font-size:14px; font-weight:600; color:#666; cursor:pointer; border:none; background:none; position:relative; }
         .emp-tab.active { color:${BLUE}; }
         .emp-tab.active::after { content:''; position:absolute; left:0; right:0; bottom:-1px; height:3px; background:${BLUE}; border-radius:3px 3px 0 0; }
@@ -27,7 +27,7 @@ export default function Employers() {
 
       {/* Hero */}
       <section style={{ background:'linear-gradient(135deg, #062b56 0%, #0a4a8c 60%, #0f5fb5 100%)', padding:'44px 16px 32px', textAlign:'center' }}>
-        <div style={{ maxWidth:'1128px', margin:'0 auto' }}>
+        <div style={{ maxWidth:'1320px', margin:'0 auto' }}>
           <span style={{ display:'inline-block', background:GOLD, color:'#fff', fontWeight:700, fontSize:'11px', letterSpacing:'0.08em', padding:'5px 16px', borderRadius:'16px', marginBottom:'14px' }}>FOR EMPLOYERS</span>
           <h1 style={{ fontSize:'clamp(1.5rem,3.2vw,2.1rem)', fontWeight:700, color:'white', marginBottom:'10px' }}>
             Hire Top Talent Across India and the GCC
@@ -48,7 +48,7 @@ export default function Employers() {
         ))}
       </div>
 
-      <div style={{ maxWidth:'1128px', margin:'0 auto', padding:'32px 16px' }}>
+      <div style={{ maxWidth:'1320px', margin:'0 auto', padding:'32px 16px' }}>
         {tab === 'home' && (
           <>
             <h2 style={{ fontWeight:700, fontSize:'18px', color:'#1a1a1a', marginBottom:'18px' }}>Why hire with IIPA JOBS</h2>

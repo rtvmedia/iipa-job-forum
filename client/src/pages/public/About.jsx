@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 
 const BLUE = '#0a66c2';
-const W = '1128px';
+const W = '1320px';
 
 export default function About() {
   return (

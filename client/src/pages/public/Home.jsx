@@ -28,7 +28,7 @@ const LOCATIONS = [
   { country:'Bahrain', cities:['Manama'] },
 ];
 
-const W = '1128px';
+const W = '1320px';
 const BLUE = '#0a66c2';
 const BLUE_DARK = '#004182';
 

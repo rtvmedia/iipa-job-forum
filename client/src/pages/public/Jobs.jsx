@@ -83,7 +83,7 @@ export default function Jobs() {
   );
 
   return (
-    <div style={{ maxWidth:'1128px', margin:'0 auto', padding:'24px 16px' }}>
+    <div style={{ maxWidth:'1320px', margin:'0 auto', padding:'24px 16px' }}>
       <div style={{ marginBottom:'20px' }}>
         <h1 style={{ fontWeight:700, color:'#1a1a1a', fontSize:'22px' }}>
           {view === 'location' ? 'Jobs by Location' : view === 'companies' ? 'Jobs by Companies' : view === 'salaries' ? 'Jobs by Salary' : 'Find Your Next Role'}
