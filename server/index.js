@@ -49,6 +49,21 @@ if (isProd) {
   });
 }
 
+// Centralized error handler — ensures multer/upload errors (file too large,
+// wrong type) come back as JSON instead of an HTML error page that breaks
+// the frontend's error handling.
+app.use((err, req, res, next) => {
+  if (err?.name === 'MulterError') {
+    const message = err.code === 'LIMIT_FILE_SIZE' ? 'File is too large.' : err.message;
+    return res.status(400).json({ message });
+  }
+  if (err) {
+    console.error(err);
+    return res.status(err.status || 500).json({ message: err.message || 'Server error' });
+  }
+  next();
+});
+
 const PORT = process.env.PORT || 8080;
 
 // Start server first, then connect DB

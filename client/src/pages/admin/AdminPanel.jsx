@@ -196,25 +196,41 @@ export default function AdminPanel() {
   };
 
   // ---------- Branding ----------
+  const [brandingError, setBrandingError] = useState('');
   const uploadLogo = async (field, file) => {
     if (!file) return;
-    const form = new FormData();
-    form.append(field, file);
-    const { data } = await api.put('/admin/settings', form);
-    setSettings(data);
+    setBrandingError('');
+    try {
+      const form = new FormData();
+      form.append(field, file);
+      const { data } = await api.put('/admin/settings', form);
+      setSettings(data);
+    } catch (err) {
+      setBrandingError(err.response?.data?.message || 'Upload failed. Please try a different image.');
+    }
   };
   const saveBrandingText = async (field) => {
-    const form = new FormData();
-    form.append(field, brandingText[field]);
-    const { data } = await api.put('/admin/settings', form);
-    setSettings(data);
+    setBrandingError('');
+    try {
+      const form = new FormData();
+      form.append(field, brandingText[field]);
+      const { data } = await api.put('/admin/settings', form);
+      setSettings(data);
+    } catch (err) {
+      setBrandingError(err.response?.data?.message || 'Save failed.');
+    }
   };
   const uploadBarcode = async (field, file) => {
     if (!file) return;
-    const form = new FormData();
-    form.append(field, file);
-    const { data } = await api.put('/admin/settings', form);
-    setSettings(data);
+    setBrandingError('');
+    try {
+      const form = new FormData();
+      form.append(field, file);
+      const { data } = await api.put('/admin/settings', form);
+      setSettings(data);
+    } catch (err) {
+      setBrandingError(err.response?.data?.message || 'Upload failed. Please try a different image.');
+    }
   };
   const deleteBarcode = async (which) => {
     const { data } = await api.delete(`/admin/settings/${which}-barcode`);
@@ -576,6 +592,11 @@ export default function AdminPanel() {
           {tab === 'branding' && (
             <>
               <h2 style={{ fontWeight:700, fontSize:'17px', color:'#1a1a1a', marginBottom:'14px' }}>Logo & Branding</h2>
+              {brandingError && (
+                <div style={{ background:'#fce8e8', color:RED, border:`1px solid ${RED}`, borderRadius:'8px', padding:'10px 16px', fontSize:'13px', marginBottom:'14px' }}>
+                  ⚠ {brandingError}
+                </div>
+              )}
               <div className="admin-grid">
                 <div className="admin-card" style={{ padding:'20px', gridColumn:'span 3' }}>
                   <p style={{ fontWeight:600, color:'#1a1a1a', fontSize:'14px', marginBottom:'10px' }}>Header Logo</p>
