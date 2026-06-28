@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 
@@ -21,6 +21,8 @@ const FIND_JOBS_MENU = [
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isEmployerContext = location.pathname.startsWith('/employers');
   const [open, setOpen] = useState(false);
   const [findJobsOpen, setFindJobsOpen] = useState(false);
   const [logoUrl, setLogoUrl] = useState(null);
@@ -111,10 +113,18 @@ export default function Navbar() {
                 Logout
               </button>
             </>
+          ) : isEmployerContext ? (
+            <>
+              <Link to="/login" style={{ color:'rgba(255,255,255,0.85)', fontSize:'14px' }}>Sign In</Link>
+              <Link to="/register?role=recruiter"
+                style={{ background:'linear-gradient(135deg, #138808, #0d6b06)', color:'#fff', fontWeight:700, fontSize:'13px', padding:'6px 16px', borderRadius:'16px', boxShadow:'0 2px 8px rgba(19,136,8,0.4)' }}>
+                Register as Employer
+              </Link>
+            </>
           ) : (
             <>
               <Link to="/login" style={{ color:'rgba(255,255,255,0.85)', fontSize:'14px' }}>Sign In</Link>
-              <Link to="/register"
+              <Link to="/register?role=seeker"
                 style={{ background:'#FF9933', color:'#1a237e', fontWeight:600, fontSize:'13px', padding:'6px 16px', borderRadius:'16px' }}>
                 Get Started
               </Link>
@@ -165,13 +175,24 @@ export default function Navbar() {
                   Logout
                 </button>
               </>
+            ) : isEmployerContext ? (
+              <>
+                <Link to="/login" onClick={() => setOpen(false)}
+                  style={{ color:'rgba(255,255,255,0.85)', fontSize:'15px', textAlign:'center', padding:'12px', border:'1px solid rgba(255,255,255,0.3)', borderRadius:'8px' }}>
+                  Sign In
+                </Link>
+                <Link to="/register?role=recruiter" onClick={() => setOpen(false)}
+                  style={{ background:'#138808', color:'#fff', fontWeight:700, fontSize:'14px', padding:'12px', borderRadius:'8px', textAlign:'center' }}>
+                  Register as Employer
+                </Link>
+              </>
             ) : (
               <>
                 <Link to="/login" onClick={() => setOpen(false)}
                   style={{ color:'rgba(255,255,255,0.85)', fontSize:'15px', textAlign:'center', padding:'12px', border:'1px solid rgba(255,255,255,0.3)', borderRadius:'8px' }}>
                   Sign In
                 </Link>
-                <Link to="/register" onClick={() => setOpen(false)}
+                <Link to="/register?role=seeker" onClick={() => setOpen(false)}
                   style={{ background:'#FF9933', color:'#1a237e', fontWeight:600, fontSize:'14px', padding:'12px', borderRadius:'8px', textAlign:'center' }}>
                   Get Started
                 </Link>

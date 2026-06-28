@@ -35,12 +35,6 @@ export default function Login() {
         </div>
 
         <div style={{ background:'#fff', borderRadius:'8px', boxShadow:'0 0 0 1px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.06)', padding:'24px' }}>
-          <div style={{ background:'#f0f7ff', border:'1px solid #c8e0f9', borderRadius:'6px', padding:'10px 14px', marginBottom:'18px', fontSize:'13px', color:'#004182' }}>
-            <strong>Demo accounts:</strong><br />
-            Seeker: seeker@iipa.org / password123<br />
-            Recruiter: recruiter@iipa.org / password123
-          </div>
-
           <form onSubmit={handleSubmit} style={{ display:'flex', flexDirection:'column', gap:'14px' }}>
             <div>
               <label style={{ display:'block', fontSize:'13px', fontWeight:500, color:'#333', marginBottom:'5px' }}>Email</label>

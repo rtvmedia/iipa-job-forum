@@ -9,7 +9,8 @@ export default function Register() {
   const { register } = useAuth();
   const navigate      = useNavigate();
   const [searchParams] = useSearchParams();
-  const [form, setForm] = useState({ fullName:'', email:'', password:'', role:searchParams.get('role')||'seeker', phone:'', location:'' });
+  const role = searchParams.get('role') === 'recruiter' ? 'recruiter' : 'seeker';
+  const [form, setForm] = useState({ fullName:'', email:'', password:'', role, phone:'', location:'' });
   const [error, setError]     = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -37,16 +38,8 @@ export default function Register() {
         </div>
 
         <div style={{ background:'#fff', borderRadius:'8px', boxShadow:'0 0 0 1px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.06)', padding:'24px' }}>
-          <div style={{ display:'flex', gap:'6px', background:'#f3f2ef', padding:'4px', borderRadius:'6px', marginBottom:'18px' }}>
-            {['seeker','recruiter'].map(r => (
-              <button key={r} type="button" onClick={() => set('role', r)}
-                style={{ flex:1, padding:'8px', borderRadius:'4px', border:'none', fontSize:'13px', fontWeight:600, cursor:'pointer', transition:'all 0.15s',
-                  background: form.role===r ? '#fff' : 'transparent',
-                  color: form.role===r ? BLUE : '#555',
-                  boxShadow: form.role===r ? '0 1px 3px rgba(0,0,0,0.12)' : 'none' }}>
-                {r==='seeker' ? '🔍 Job Seeker' : '🏢 Employer'}
-              </button>
-            ))}
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', background: role==='recruiter' ? '#fff7ea' : '#f0f7ff', border: `1px solid ${role==='recruiter' ? '#fbe1bf' : '#c8e0f9'}`, padding:'10px', borderRadius:'6px', marginBottom:'18px', fontSize:'13px', fontWeight:600, color: role==='recruiter' ? '#b45309' : BLUE }}>
+            {role==='recruiter' ? '🏢 Registering as an Employer' : '🔍 Registering as a Job Seeker'}
           </div>
 
           <form onSubmit={handleSubmit} style={{ display:'flex', flexDirection:'column', gap:'14px' }}>
