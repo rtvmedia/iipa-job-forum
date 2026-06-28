@@ -24,10 +24,10 @@ export default function Footer() {
             {logoUrl && (
               <span style={{ display:'flex', flexDirection:'column', alignItems:'center', flexShrink:0 }}>
                 <img src={logoUrl} alt="Logo" style={{
-                  width:'48px', height:'48px', objectFit:'contain', display:'block',
+                  width:'48px', height:'48px', objectFit:'cover', borderRadius:'50%', display:'block',
                   filter:'drop-shadow(0 2px 6px rgba(0,0,0,0.35))',
                 }} />
-                <span style={{ color:'rgba(255,255,255,0.55)', fontSize:'7px', fontWeight:600, lineHeight:1.2, textAlign:'center', marginTop:'2px' }}>
+                <span style={{ color:'rgba(255,255,255,0.65)', fontSize:'9px', fontWeight:600, lineHeight:1.25, textAlign:'center', marginTop:'3px' }}>
                   International Indian<br />Professionals Association
                 </span>
               </span>

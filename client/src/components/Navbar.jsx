@@ -43,17 +43,17 @@ export default function Navbar() {
   return (
     <nav style={{ background:'#1a237e', position:'sticky', top:0, zIndex:50, boxShadow:'0 1px 3px rgba(0,0,0,0.2)' }}>
       <div className="tricolor" />
-      <div style={{ maxWidth:'1320px', margin:'0 auto', padding:'0 16px', display:'flex', alignItems:'center', justifyContent:'space-between', height:'78px' }}>
+      <div style={{ maxWidth:'1320px', margin:'0 auto', padding:'0 16px', display:'flex', alignItems:'center', justifyContent:'space-between', height:'86px' }}>
 
         {/* Logo */}
         <Link to="/" onClick={() => setOpen(false)} style={{ display:'flex', alignItems:'center', gap:'12px', flexShrink:0 }}>
           {logoUrl && (
             <span style={{ display:'flex', flexDirection:'column', alignItems:'center', flexShrink:0 }}>
               <img src={logoUrl} alt="Logo" style={{
-                width:'54px', height:'54px', objectFit:'contain', display:'block',
+                width:'54px', height:'54px', objectFit:'cover', borderRadius:'50%', display:'block',
                 filter:'drop-shadow(0 2px 6px rgba(0,0,0,0.35))',
               }} />
-              <span style={{ color:'rgba(255,255,255,0.7)', fontSize:'7.5px', fontWeight:600, lineHeight:1.2, textAlign:'center', marginTop:'2px', letterSpacing:'0.01em' }}>
+              <span style={{ color:'rgba(255,255,255,0.8)', fontSize:'9.5px', fontWeight:600, lineHeight:1.25, textAlign:'center', marginTop:'3px', letterSpacing:'0.01em' }}>
                 International Indian<br />Professionals Association
               </span>
             </span>
