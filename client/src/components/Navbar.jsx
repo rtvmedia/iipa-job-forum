@@ -78,26 +78,35 @@ export default function Navbar() {
         <div style={{ display:'flex', alignItems:'center', gap:'22px', fontSize:'14px' }} className="desk-nav" ref={menuRef}>
           <Link to="/" style={{ color:'rgba(255,255,255,0.85)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.85)'}>Home</Link>
 
-          <div style={{ position:'relative' }}>
-            <button onClick={() => setFindJobsOpen(o => !o)}
-              style={{ background:'none', border:'none', color:'rgba(255,255,255,0.85)', fontSize:'14px', cursor:'pointer', display:'flex', alignItems:'center', gap:'4px', padding:0 }}
-              onMouseEnter={e=>e.currentTarget.style.color='#FF9933'} onMouseLeave={e=>e.currentTarget.style.color='rgba(255,255,255,0.85)'}>
-              Find Jobs <span style={{ fontSize:'10px', transform: findJobsOpen ? 'rotate(180deg)' : 'none', transition:'transform 0.15s' }}>▾</span>
-            </button>
-            {findJobsOpen && (
-              <div style={{ position:'absolute', top:'28px', left:0, background:'#fff', borderRadius:'10px', boxShadow:'0 12px 30px rgba(0,0,0,0.2)', minWidth:'190px', overflow:'hidden', zIndex:80 }}>
-                {FIND_JOBS_MENU.map((item, i) => (
-                  <Link key={item.label} to={item.to} onClick={() => setFindJobsOpen(false)}
-                    style={{ display:'block', padding:'10px 16px', fontSize:'13.5px', color:'#333', borderBottom: i < FIND_JOBS_MENU.length-1 ? '1px solid #f0f0f0' : 'none' }}
-                    onMouseEnter={e=>e.target.style.background='#f5f7ff'} onMouseLeave={e=>e.target.style.background='transparent'}>
-                    {item.label}
-                  </Link>
-                ))}
+          {isEmployerContext ? (
+            <>
+              <Link to="/employers?tab=postjob" style={{ color:'rgba(255,255,255,0.85)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.85)'}>Post a Job</Link>
+              <Link to="/employers?tab=candidates" style={{ color:'rgba(255,255,255,0.85)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.85)'}>Find Candidates</Link>
+            </>
+          ) : (
+            <>
+              <div style={{ position:'relative' }}>
+                <button onClick={() => setFindJobsOpen(o => !o)}
+                  style={{ background:'none', border:'none', color:'rgba(255,255,255,0.85)', fontSize:'14px', cursor:'pointer', display:'flex', alignItems:'center', gap:'4px', padding:0 }}
+                  onMouseEnter={e=>e.currentTarget.style.color='#FF9933'} onMouseLeave={e=>e.currentTarget.style.color='rgba(255,255,255,0.85)'}>
+                  Find Jobs <span style={{ fontSize:'10px', transform: findJobsOpen ? 'rotate(180deg)' : 'none', transition:'transform 0.15s' }}>▾</span>
+                </button>
+                {findJobsOpen && (
+                  <div style={{ position:'absolute', top:'28px', left:0, background:'#fff', borderRadius:'10px', boxShadow:'0 12px 30px rgba(0,0,0,0.2)', minWidth:'190px', overflow:'hidden', zIndex:80 }}>
+                    {FIND_JOBS_MENU.map((item, i) => (
+                      <Link key={item.label} to={item.to} onClick={() => setFindJobsOpen(false)}
+                        style={{ display:'block', padding:'10px 16px', fontSize:'13.5px', color:'#333', borderBottom: i < FIND_JOBS_MENU.length-1 ? '1px solid #f0f0f0' : 'none' }}
+                        onMouseEnter={e=>e.target.style.background='#f5f7ff'} onMouseLeave={e=>e.target.style.background='transparent'}>
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
 
-          <Link to="/register?role=seeker" style={{ color:'rgba(255,255,255,0.85)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.85)'}>Create Profile</Link>
+              <Link to="/register?role=seeker" style={{ color:'rgba(255,255,255,0.85)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.85)'}>Create Profile</Link>
+            </>
+          )}
         </div>
 
         {/* Desktop auth */}
@@ -155,13 +164,22 @@ export default function Navbar() {
         </div>
         <div style={{ padding:'4px 20px 24px', display:'flex', flexDirection:'column', gap:'4px' }}>
           <Link to="/" onClick={() => setOpen(false)} style={{ color:'rgba(255,255,255,0.85)', fontSize:'16px', padding:'12px 0', borderBottom:'1px solid rgba(255,255,255,0.1)' }}>Home</Link>
-          {FIND_JOBS_MENU.map(item => (
-            <Link key={item.label} to={item.to} onClick={() => setOpen(false)}
-              style={{ color:'rgba(255,255,255,0.7)', fontSize:'14px', padding:'10px 0 10px 14px', borderBottom:'1px solid rgba(255,255,255,0.07)' }}>
-              {item.label}
-            </Link>
-          ))}
-          <Link to="/register?role=seeker" onClick={() => setOpen(false)} style={{ color:'rgba(255,255,255,0.85)', fontSize:'16px', padding:'12px 0', borderBottom:'1px solid rgba(255,255,255,0.1)' }}>Create Profile</Link>
+          {isEmployerContext ? (
+            <>
+              <Link to="/employers?tab=postjob" onClick={() => setOpen(false)} style={{ color:'rgba(255,255,255,0.85)', fontSize:'16px', padding:'12px 0', borderBottom:'1px solid rgba(255,255,255,0.1)' }}>Post a Job</Link>
+              <Link to="/employers?tab=candidates" onClick={() => setOpen(false)} style={{ color:'rgba(255,255,255,0.85)', fontSize:'16px', padding:'12px 0', borderBottom:'1px solid rgba(255,255,255,0.1)' }}>Find Candidates</Link>
+            </>
+          ) : (
+            <>
+              {FIND_JOBS_MENU.map(item => (
+                <Link key={item.label} to={item.to} onClick={() => setOpen(false)}
+                  style={{ color:'rgba(255,255,255,0.7)', fontSize:'14px', padding:'10px 0 10px 14px', borderBottom:'1px solid rgba(255,255,255,0.07)' }}>
+                  {item.label}
+                </Link>
+              ))}
+              <Link to="/register?role=seeker" onClick={() => setOpen(false)} style={{ color:'rgba(255,255,255,0.85)', fontSize:'16px', padding:'12px 0', borderBottom:'1px solid rgba(255,255,255,0.1)' }}>Create Profile</Link>
+            </>
+          )}
 
           <div style={{ paddingTop:'16px', display:'flex', flexDirection:'column', gap:'10px' }}>
             {user ? (

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 const GOLD = '#d97706';
 const BLUE = '#0a66c2';
@@ -11,7 +11,10 @@ const TABS = [
 ];
 
 export default function Employers() {
-  const [tab, setTab] = useState('home');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const [tab, setTabState] = useState(['home','postjob','candidates'].includes(tabParam) ? tabParam : 'home');
+  const setTab = (key) => { setTabState(key); setSearchParams(key === 'home' ? {} : { tab: key }); };
 
   return (
     <div>
