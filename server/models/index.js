@@ -11,6 +11,8 @@ const WorkExperience = require('./WorkExperience');
 const Education      = require('./Education');
 const Certification  = require('./Certification');
 const SavedJob       = require('./SavedJob');
+const Project        = require('./Project');
+const Reference      = require('./Reference');
 
 // Associations
 User.hasMany(Job,         { foreignKey: 'recruiterId', as: 'postedJobs' });
@@ -45,7 +47,13 @@ SavedJob.belongsTo(User,   { foreignKey: 'userId' });
 Job.hasMany(SavedJob,      { foreignKey: 'jobId',  as: 'savedBy' });
 SavedJob.belongsTo(Job,    { foreignKey: 'jobId',  as: 'job' });
 
+User.hasMany(Project,      { foreignKey: 'userId', as: 'projects' });
+Project.belongsTo(User,    { foreignKey: 'userId' });
+
+User.hasMany(Reference,    { foreignKey: 'userId', as: 'references' });
+Reference.belongsTo(User,  { foreignKey: 'userId' });
+
 module.exports = {
   sequelize, User, Job, Application, NewsPost, Event, Album, AlbumImage, SiteSetting,
-  WorkExperience, Education, Certification, SavedJob,
+  WorkExperience, Education, Certification, SavedJob, Project, Reference,
 };

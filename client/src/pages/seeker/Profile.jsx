@@ -98,6 +98,8 @@ export default function SeekerProfile() {
   const [workExp, setWorkExp] = useState([]);
   const [education, setEducation] = useState([]);
   const [certs, setCerts] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [references, setReferences] = useState([]);
 
   const loadAll = () => {
     api.get('/auth/profile').then(r => {
@@ -115,6 +117,8 @@ export default function SeekerProfile() {
     api.get('/seeker/work-experience').then(r => setWorkExp(r.data)).catch(() => {});
     api.get('/seeker/education').then(r => setEducation(r.data)).catch(() => {});
     api.get('/seeker/certifications').then(r => setCerts(r.data)).catch(() => {});
+    api.get('/seeker/projects').then(r => setProjects(r.data)).catch(() => {});
+    api.get('/seeker/references').then(r => setReferences(r.data)).catch(() => {});
   };
 
   useEffect(() => { loadAll(); }, []);
@@ -316,6 +320,29 @@ export default function SeekerProfile() {
         ]}
       />
 
+      {/* Projects */}
+      <RepeatableSection
+        title="Projects"
+        items={projects}
+        onAdd={async (data) => { const { data: row } = await api.post('/seeker/projects', data); setProjects(w => [...w, row]); }}
+        onUpdate={async (id, data) => { const { data: row } = await api.put(`/seeker/projects/${id}`, data); setProjects(w => w.map(x => x.id === id ? row : x)); }}
+        onDelete={async (id) => { await api.delete(`/seeker/projects/${id}`); setProjects(w => w.filter(x => x.id !== id)); }}
+        renderSummary={(p) => (
+          <>
+            <strong>{p.title}</strong>{p.technologies ? ` · ${p.technologies}` : ''}<br />
+            <span style={{ color:'#777' }}>{p.startDate || ''} {p.endDate ? `— ${p.endDate}` : ''}</span>
+          </>
+        )}
+        fields={[
+          { name:'title', label:'Project Title', full:true },
+          { name:'technologies', label:'Technologies Used' },
+          { name:'projectUrl', label:'Project URL' },
+          { name:'startDate', label:'Start Date', type:'date' },
+          { name:'endDate', label:'End Date', type:'date' },
+          { name:'description', label:'Description', type:'textarea', full:true },
+        ]}
+      />
+
       {/* Languages */}
       <div style={card}>
         <div style={cardHead}>
@@ -341,6 +368,29 @@ export default function SeekerProfile() {
           {languages.length > 0 && <button onClick={handleSave} style={{ ...btnGhost, marginTop:'4px' }}>Save Languages</button>}
         </div>
       </div>
+
+      {/* References */}
+      <RepeatableSection
+        title="References"
+        items={references}
+        onAdd={async (data) => { const { data: row } = await api.post('/seeker/references', data); setReferences(w => [...w, row]); }}
+        onUpdate={async (id, data) => { const { data: row } = await api.put(`/seeker/references/${id}`, data); setReferences(w => w.map(x => x.id === id ? row : x)); }}
+        onDelete={async (id) => { await api.delete(`/seeker/references/${id}`); setReferences(w => w.filter(x => x.id !== id)); }}
+        renderSummary={(r) => (
+          <>
+            <strong>{r.name}</strong>{r.position ? `, ${r.position}` : ''}{r.company ? ` at ${r.company}` : ''}<br />
+            <span style={{ color:'#777' }}>{r.email || ''} {r.phone ? `· ${r.phone}` : ''}</span>
+          </>
+        )}
+        fields={[
+          { name:'name', label:'Name' },
+          { name:'relationship', label:'Relationship' },
+          { name:'position', label:'Position' },
+          { name:'company', label:'Company' },
+          { name:'email', label:'Email' },
+          { name:'phone', label:'Phone' },
+        ]}
+      />
 
       {/* Resume */}
       <div style={card}>

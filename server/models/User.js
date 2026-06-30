@@ -11,7 +11,7 @@ const User = sequelize.define('User', {
   location:     { type: DataTypes.STRING(100) },
   headline:     { type: DataTypes.STRING(200) },
   bio:          { type: DataTypes.TEXT },
-  avatarUrl:    { type: DataTypes.STRING(300) },
+  avatarUrl:    { type: DataTypes.TEXT('long') },
   isActive:     { type: DataTypes.BOOLEAN, defaultValue: true },
   nationality:  { type: DataTypes.STRING(60), defaultValue: 'Indian' },
   approvalStatus: { type: DataTypes.ENUM('approved', 'pending', 'rejected'), defaultValue: 'approved' },
@@ -37,6 +37,7 @@ const User = sequelize.define('User', {
   salaryExpectation:   { type: DataTypes.STRING(100) },
   noticePeriod:        { type: DataTypes.STRING(60) },
   workMode:            { type: DataTypes.STRING(30) },     // remote / hybrid / onsite
+  profileViews:        { type: DataTypes.INTEGER, defaultValue: 0 },
 }, { tableName: 'users', timestamps: true });
 
 module.exports = User;
