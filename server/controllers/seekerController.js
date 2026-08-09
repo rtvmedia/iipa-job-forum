@@ -1,11 +1,15 @@
 const { WorkExperience, Education, Certification, SavedJob, Job, User, Project, Reference } = require('../models');
 
+const requireFields = (body, fields) => fields.filter(f => !String(body[f] ?? '').trim());
+
 // ---------- Work Experience ----------
 const getWorkExperiences = async (req, res) => {
   const rows = await WorkExperience.findAll({ where: { userId: req.user.id }, order: [['startDate', 'DESC']] });
   res.json(rows);
 };
 const addWorkExperience = async (req, res) => {
+  const missing = requireFields(req.body, ['jobTitle', 'company']);
+  if (missing.length) return res.status(400).json({ message: `Missing required field(s): ${missing.join(', ')}` });
   const row = await WorkExperience.create({ ...req.body, userId: req.user.id });
   res.status(201).json(row);
 };
@@ -28,6 +32,8 @@ const getEducations = async (req, res) => {
   res.json(rows);
 };
 const addEducation = async (req, res) => {
+  const missing = requireFields(req.body, ['degree', 'institution']);
+  if (missing.length) return res.status(400).json({ message: `Missing required field(s): ${missing.join(', ')}` });
   const row = await Education.create({ ...req.body, userId: req.user.id });
   res.status(201).json(row);
 };
@@ -50,6 +56,8 @@ const getCertifications = async (req, res) => {
   res.json(rows);
 };
 const addCertification = async (req, res) => {
+  const missing = requireFields(req.body, ['certificateName']);
+  if (missing.length) return res.status(400).json({ message: `Missing required field(s): ${missing.join(', ')}` });
   const row = await Certification.create({ ...req.body, userId: req.user.id });
   res.status(201).json(row);
 };
@@ -91,6 +99,8 @@ const getProjects = async (req, res) => {
   res.json(rows);
 };
 const addProject = async (req, res) => {
+  const missing = requireFields(req.body, ['title']);
+  if (missing.length) return res.status(400).json({ message: `Missing required field(s): ${missing.join(', ')}` });
   const row = await Project.create({ ...req.body, userId: req.user.id });
   res.status(201).json(row);
 };
@@ -113,6 +123,8 @@ const getReferences = async (req, res) => {
   res.json(rows);
 };
 const addReference = async (req, res) => {
+  const missing = requireFields(req.body, ['name']);
+  if (missing.length) return res.status(400).json({ message: `Missing required field(s): ${missing.join(', ')}` });
   const row = await Reference.create({ ...req.body, userId: req.user.id });
   res.status(201).json(row);
 };

@@ -35,7 +35,7 @@ const getJobApplicants = async (req, res) => {
 
     const applications = await Application.findAll({
       where: { jobId: req.params.jobId },
-      include: [{ model: User, as: 'seeker', attributes: ['fullName', 'email', 'phone', 'headline', 'location'] }],
+      include: [{ model: User, as: 'seeker', attributes: ['fullName', 'email', 'phone', 'headline', 'location', 'resumeUrl', 'currentJobTitle', 'yearsOfExperience', 'skills'] }],
       order: [['createdAt', 'DESC']],
     });
     res.json(applications);

@@ -101,8 +101,16 @@ export default function Applicants() {
                         </p>
                       </div>
                     </div>
-                    {app.seeker?.headline && (
-                      <p className="text-gray-500 text-xs mt-2 ml-12" style={{ fontFamily:'system-ui' }}>{app.seeker.headline}</p>
+                    {(app.seeker?.currentJobTitle || app.seeker?.headline) && (
+                      <p className="text-gray-500 text-xs mt-2 ml-12" style={{ fontFamily:'system-ui' }}>
+                        {app.seeker?.currentJobTitle || app.seeker?.headline}
+                        {app.seeker?.yearsOfExperience ? ` · ${app.seeker.yearsOfExperience} yrs experience` : ''}
+                      </p>
+                    )}
+                    {app.seeker?.skills && (
+                      <p className="text-gray-400 text-xs mt-1 ml-12" style={{ fontFamily:'system-ui' }}>
+                        Skills: {app.seeker.skills}
+                      </p>
                     )}
                     {app.coverLetter && (
                       <p className="text-gray-500 text-xs mt-2 ml-12 leading-relaxed line-clamp-2" style={{ fontFamily:'system-ui' }}>
@@ -112,6 +120,26 @@ export default function Applicants() {
                     <p className="text-gray-400 text-xs mt-2 ml-12" style={{ fontFamily:'system-ui' }}>
                       Applied {new Date(app.createdAt).toLocaleDateString()}
                     </p>
+                    <div className="ml-12 mt-2 flex gap-2 flex-wrap">
+                      {app.seeker?.resumeUrl ? (
+                        <a href={app.seeker.resumeUrl} target="_blank" rel="noopener noreferrer"
+                          className="text-xs font-semibold text-white px-3 py-1.5 rounded-lg inline-flex items-center gap-1"
+                          style={{ fontFamily:'system-ui', background:'#0a2342' }}>
+                          ⬇ Download Resume
+                        </a>
+                      ) : (
+                        <span className="text-xs text-gray-400 px-3 py-1.5" style={{ fontFamily:'system-ui' }}>
+                          No resume uploaded
+                        </span>
+                      )}
+                      {app.seeker?.email && (
+                        <a href={`mailto:${app.seeker.email}`}
+                          className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-[#0a2342] text-[#0a2342]"
+                          style={{ fontFamily:'system-ui' }}>
+                          ✉ Contact
+                        </a>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex flex-col items-end gap-2 shrink-0">

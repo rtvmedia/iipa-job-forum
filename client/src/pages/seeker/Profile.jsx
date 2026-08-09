@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
@@ -15,20 +15,144 @@ const btnDanger = { background:'#fff', color:'#c62828', fontWeight:600, fontSize
 const focus = e => e.target.style.borderColor = BLUE;
 const blur  = e => e.target.style.borderColor = '#ddd';
 
+const LOCATION_OPTIONS = [
+  'Remote',
+  'India', 'India - Mumbai', 'India - Delhi', 'India - Bangalore', 'India - Hyderabad', 'India - Chennai', 'India - Pune', 'India - Kolkata', 'India - Ahmedabad',
+  'Saudi Arabia', 'Saudi Arabia - Riyadh', 'Saudi Arabia - Jeddah', 'Saudi Arabia - Dammam', 'Saudi Arabia - Khobar', 'Saudi Arabia - Mecca', 'Saudi Arabia - Medina', 'Saudi Arabia - Jubail',
+  'UAE', 'UAE - Dubai', 'UAE - Abu Dhabi', 'UAE - Sharjah', 'UAE - Ajman',
+  'Qatar', 'Qatar - Doha',
+  'Kuwait', 'Kuwait - Kuwait City',
+  'Oman', 'Oman - Muscat',
+  'Bahrain', 'Bahrain - Manama',
+];
+
+const VISA_OPTIONS = [
+  'Not Required', 'Employment Visa', 'Visit Visa (Transferable)', 'Visit Visa (Non-Transferable)',
+  'Family / Dependent Visa', 'Student Visa', 'Iqama', 'Golden Visa', 'Work Permit', 'Under Process', 'Other',
+];
+
+const NOTICE_OPTIONS = ['Immediate', '15 days', '30 days', '45 days', '60 days', '90 days', 'Other'];
+
+const LANGUAGE_OPTIONS = [
+  'English', 'Hindi', 'Urdu', 'Arabic', 'French', 'Spanish', 'German', 'Mandarin Chinese', 'Tamil', 'Telugu',
+  'Bengali', 'Punjabi', 'Malayalam', 'Kannada', 'Marathi', 'Gujarati', 'Persian / Farsi', 'Portuguese', 'Russian',
+  'Italian', 'Japanese', 'Korean', 'Turkish', 'Swahili', 'Tagalog / Filipino', 'Indonesian', 'Malay', 'Nepali',
+  'Sinhala', 'Thai', 'Vietnamese', 'Dutch', 'Polish', 'Ukrainian', 'Amharic', 'Pashto', 'Dari',
+];
+
+function SearchableCombobox({ value, onChange, options, placeholder }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const onClick = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('click', onClick);
+    return () => document.removeEventListener('click', onClick);
+  }, []);
+
+  const query = value || '';
+  const filtered = options.filter(o => o.toLowerCase().includes(query.toLowerCase())).slice(0, 50);
+
+  return (
+    <div ref={ref} style={{ position:'relative' }}>
+      <input style={inp} value={query} placeholder={placeholder} autoComplete="off"
+        onFocus={(e) => { focus(e); setOpen(true); }}
+        onBlur={blur}
+        onChange={e => { onChange(e.target.value); setOpen(true); }} />
+      {open && filtered.length > 0 && (
+        <div style={{ position:'absolute', top:'100%', left:0, right:0, background:'#fff', border:'1px solid #ddd', borderRadius:'6px', boxShadow:'0 8px 20px rgba(0,0,0,0.15)', maxHeight:'220px', overflowY:'auto', zIndex:50, marginTop:'2px' }}>
+          {filtered.map(o => (
+            <div key={o} onMouseDown={() => { onChange(o); setOpen(false); }}
+              style={{ padding:'8px 12px', fontSize:'13px', cursor:'pointer' }}
+              onMouseEnter={e=>e.currentTarget.style.background='#f0f4fb'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+              {o}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TagCombobox({ value, onChange, options, placeholder }) {
+  const tags = value ? value.split(',').map(s => s.trim()).filter(Boolean) : [];
+  const [query, setQuery] = useState('');
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const onClick = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('click', onClick);
+    return () => document.removeEventListener('click', onClick);
+  }, []);
+
+  const addTag = (t) => {
+    const trimmed = t.trim();
+    if (!trimmed || tags.includes(trimmed)) { setQuery(''); return; }
+    onChange([...tags, trimmed].join(', '));
+    setQuery('');
+  };
+  const removeTag = (t) => onChange(tags.filter(x => x !== t).join(', '));
+
+  const filtered = options.filter(o => !tags.includes(o) && o.toLowerCase().includes(query.toLowerCase())).slice(0, 50);
+
+  return (
+    <div ref={ref} style={{ position:'relative' }}>
+      <div style={{ ...inp, display:'flex', flexWrap:'wrap', gap:'6px', alignItems:'center', height:'auto', minHeight:'38px', padding:'6px 8px' }}>
+        {tags.map(t => (
+          <span key={t} style={{ background:'#eef2fb', color:BLUE, fontSize:'12px', fontWeight:600, padding:'3px 8px', borderRadius:'10px', display:'inline-flex', alignItems:'center', gap:'5px' }}>
+            {t}
+            <span onClick={() => removeTag(t)} style={{ cursor:'pointer', fontWeight:700 }}>×</span>
+          </span>
+        ))}
+        <input value={query} placeholder={tags.length ? '' : placeholder} autoComplete="off"
+          onFocus={() => setOpen(true)}
+          onChange={e => { setQuery(e.target.value); setOpen(true); }}
+          onKeyDown={e => {
+            if ((e.key === 'Enter' || e.key === ',') && query.trim()) { e.preventDefault(); addTag(query); }
+            if (e.key === 'Backspace' && !query && tags.length) removeTag(tags[tags.length-1]);
+          }}
+          style={{ border:'none', outline:'none', flex:1, minWidth:'100px', fontSize:'13.5px' }} />
+      </div>
+      {open && filtered.length > 0 && (
+        <div style={{ position:'absolute', top:'100%', left:0, right:0, background:'#fff', border:'1px solid #ddd', borderRadius:'6px', boxShadow:'0 8px 20px rgba(0,0,0,0.15)', maxHeight:'220px', overflowY:'auto', zIndex:50, marginTop:'2px' }}>
+          {filtered.map(o => (
+            <div key={o} onMouseDown={() => addTag(o)} style={{ padding:'8px 12px', fontSize:'13px', cursor:'pointer' }}
+              onMouseEnter={e=>e.currentTarget.style.background='#f0f4fb'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+              {o}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function RepeatableSection({ title, items, fields, onAdd, onUpdate, onDelete, renderSummary }) {
   const empty = Object.fromEntries(fields.map(f => [f.name, f.type === 'checkbox' ? false : '']));
   const [form, setForm]   = useState(empty);
   const [editing, setEditing] = useState(null); // id being edited, or 'new'
+  const [formError, setFormError] = useState('');
 
-  const startNew = () => { setForm(empty); setEditing('new'); };
-  const startEdit = (item) => { setForm({ ...empty, ...item }); setEditing(item.id); };
-  const cancel = () => { setEditing(null); setForm(empty); };
+  const startNew = () => { setForm(empty); setFormError(''); setEditing('new'); };
+  const startEdit = (item) => { setForm({ ...empty, ...item }); setFormError(''); setEditing(item.id); };
+  const cancel = () => { setEditing(null); setForm(empty); setFormError(''); };
 
   const submit = async (e) => {
     e.preventDefault();
-    if (editing === 'new') await onAdd(form);
-    else await onUpdate(editing, form);
-    cancel();
+    const missing = fields.filter(f => f.required && !String(form[f.name] ?? '').trim());
+    if (missing.length) {
+      setFormError(`Please fill in: ${missing.map(f => f.label).join(', ')}`);
+      return;
+    }
+    setFormError('');
+    try {
+      if (editing === 'new') await onAdd(form);
+      else await onUpdate(editing, form);
+      cancel();
+    } catch (err) {
+      setFormError(err.response?.data?.message || 'Save failed. Please try again.');
+    }
   };
 
   return (
@@ -54,7 +178,7 @@ function RepeatableSection({ title, items, fields, onAdd, onUpdate, onDelete, re
           <form onSubmit={submit} style={{ marginTop: items.length ? '12px' : 0, display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px' }}>
             {fields.map(f => (
               <div key={f.name} style={f.full ? { gridColumn:'1/-1' } : undefined}>
-                <label style={label}>{f.label}</label>
+                <label style={label}>{f.label}{f.required ? ' *' : ''}</label>
                 {f.type === 'checkbox' ? (
                   <label style={{ display:'flex', alignItems:'center', gap:'6px', fontSize:'13px' }}>
                     <input type="checkbox" checked={!!form[f.name]} onChange={e => setForm(s => ({ ...s, [f.name]:e.target.checked }))} /> {f.label}
@@ -68,6 +192,7 @@ function RepeatableSection({ title, items, fields, onAdd, onUpdate, onDelete, re
                 )}
               </div>
             ))}
+            {formError && <p style={{ color:'#c62828', fontSize:'12.5px', gridColumn:'1/-1', margin:0 }}>{formError}</p>}
             <div style={{ gridColumn:'1/-1', display:'flex', gap:'8px', marginTop:'6px' }}>
               <button type="submit" style={btnPrimary}>{editing === 'new' ? 'Add' : 'Save'}</button>
               <button type="button" onClick={cancel} style={{ ...btnGhost, color:'#666', borderColor:'#ccc' }}>Cancel</button>
@@ -155,6 +280,25 @@ export default function SeekerProfile() {
   const updateLanguage = (i, k, v) => setLanguages(l => l.map((row, idx) => idx === i ? { ...row, [k]: v } : row));
   const removeLanguage = (i) => setLanguages(l => l.filter((_, idx) => idx !== i));
 
+  const [langSaving, setLangSaving] = useState(false);
+  const [langSaved, setLangSaved]   = useState(false);
+  const [langError, setLangError]   = useState('');
+
+  const saveLanguages = async () => {
+    const invalid = languages.some(l => !l.language || !l.language.trim());
+    if (invalid) { setLangError('Please select a language for every row before saving.'); setLangSaved(false); return; }
+    setLangError(''); setLangSaving(true); setLangSaved(false);
+    try {
+      await api.put('/auth/profile', { ...form, languages: JSON.stringify(languages) });
+      setLangSaved(true);
+      setTimeout(() => setLangSaved(false), 3000);
+    } catch (err) {
+      setLangError(err.response?.data?.message || 'Save failed');
+    } finally {
+      setLangSaving(false);
+    }
+  };
+
   // Profile strength
   const strengthFields = [form.headline, form.currentJobTitle, form.location, form.skills, resumeUrl, form.bio, workExp.length, education.length];
   const strength = Math.round((strengthFields.filter(Boolean).length / strengthFields.length) * 100);
@@ -171,9 +315,15 @@ export default function SeekerProfile() {
           <h1 style={{ fontWeight:700, fontSize:'20px', color:'#1a1a1a' }}>My Profile</h1>
           <p style={{ color:'#666', fontSize:'13px', marginTop:'2px' }}>{user?.email}</p>
         </div>
-        <div style={{ background:'#f0f7ff', border:'1px solid #c8e0f9', borderRadius:'8px', padding:'10px 16px', textAlign:'center', minWidth:'120px' }}>
-          <div style={{ color:BLUE, fontWeight:800, fontSize:'1.3rem' }}>{strength}%</div>
-          <div style={{ color:'#555', fontSize:'11px' }}>Profile Strength</div>
+        <div style={{ display:'flex', alignItems:'center', gap:'12px', flexWrap:'wrap' }}>
+          <div style={{ background:'#f0f7ff', border:'1px solid #c8e0f9', borderRadius:'8px', padding:'10px 16px', textAlign:'center', minWidth:'120px' }}>
+            <div style={{ color:BLUE, fontWeight:800, fontSize:'1.3rem' }}>{strength}%</div>
+            <div style={{ color:'#555', fontSize:'11px' }}>Profile Strength</div>
+          </div>
+          <button type="button" onClick={handleSave} disabled={saving} style={{ ...btnPrimary, padding:'11px 24px', opacity:saving?0.6:1 }}>
+            {saving ? 'Saving…' : 'Save Profile'}
+          </button>
+          {saved && <span style={{ color:'#057642', fontSize:'12.5px', fontWeight:600 }}>✅ Saved</span>}
         </div>
       </div>
 
@@ -184,12 +334,12 @@ export default function SeekerProfile() {
           <div style={{ ...cardBody, display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px' }}>
             <div><label style={label}>Full Name</label><input style={inp} value={form.fullName} onChange={e=>set('fullName',e.target.value)} onFocus={focus} onBlur={blur} /></div>
             <div><label style={label}>Phone</label><input style={inp} value={form.phone} onChange={e=>set('phone',e.target.value)} onFocus={focus} onBlur={blur} placeholder="+91-..." /></div>
-            <div><label style={label}>Headline</label><input style={inp} value={form.headline} onChange={e=>set('headline',e.target.value)} onFocus={focus} onBlur={blur} placeholder="e.g. Full Stack Developer | 3 Years Experience" /></div>
+            <div><label style={label}>Professional Title</label><input style={inp} value={form.headline} onChange={e=>set('headline',e.target.value)} onFocus={focus} onBlur={blur} placeholder="e.g. Full Stack Developer | 3 Years Experience" /></div>
             <div><label style={label}>Current Job Title</label><input style={inp} value={form.currentJobTitle} onChange={e=>set('currentJobTitle',e.target.value)} onFocus={focus} onBlur={blur} /></div>
             <div><label style={label}>Years of Experience</label><input style={inp} value={form.yearsOfExperience} onChange={e=>set('yearsOfExperience',e.target.value)} onFocus={focus} onBlur={blur} placeholder="e.g. 5" /></div>
             <div><label style={label}>Nationality</label><input style={inp} value={form.nationality} onChange={e=>set('nationality',e.target.value)} onFocus={focus} onBlur={blur} /></div>
-            <div><label style={label}>Current Location</label><input style={inp} value={form.location} onChange={e=>set('location',e.target.value)} onFocus={focus} onBlur={blur} placeholder="Mumbai, India" /></div>
-            <div><label style={label}>Visa Status</label><input style={inp} value={form.visaStatus} onChange={e=>set('visaStatus',e.target.value)} onFocus={focus} onBlur={blur} placeholder="e.g. Not required / Work Visa" /></div>
+            <div><label style={label}>Current Location</label><SearchableCombobox value={form.location} onChange={v=>set('location',v)} options={LOCATION_OPTIONS} placeholder="Mumbai, India" /></div>
+            <div><label style={label}>Visa Status</label><SearchableCombobox value={form.visaStatus} onChange={v=>set('visaStatus',v)} options={VISA_OPTIONS} placeholder="e.g. Not required / Work Visa" /></div>
             <label style={{ display:'flex', alignItems:'center', gap:'8px', fontSize:'13px', gridColumn:'1/-1' }}>
               <input type="checkbox" checked={form.willingToRelocate} onChange={e=>set('willingToRelocate',e.target.checked)} /> Willing to Relocate
             </label>
@@ -206,9 +356,9 @@ export default function SeekerProfile() {
           <div style={cardHead}><h2 style={{ fontWeight:700, fontSize:'15px', color:'#1a1a1a' }}>Career Preferences</h2></div>
           <div style={{ ...cardBody, display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px' }}>
             <div><label style={label}>Desired Job Title</label><input style={inp} value={form.desiredJobTitle} onChange={e=>set('desiredJobTitle',e.target.value)} onFocus={focus} onBlur={blur} /></div>
-            <div><label style={label}>Preferred Locations</label><input style={inp} value={form.preferredLocations} onChange={e=>set('preferredLocations',e.target.value)} onFocus={focus} onBlur={blur} placeholder="Dubai, Riyadh, Remote" /></div>
+            <div><label style={label}>Preferred Locations</label><TagCombobox value={form.preferredLocations} onChange={v=>set('preferredLocations',v)} options={LOCATION_OPTIONS} placeholder="Dubai, Riyadh, Remote" /></div>
             <div><label style={label}>Salary Expectation</label><input style={inp} value={form.salaryExpectation} onChange={e=>set('salaryExpectation',e.target.value)} onFocus={focus} onBlur={blur} /></div>
-            <div><label style={label}>Notice Period</label><input style={inp} value={form.noticePeriod} onChange={e=>set('noticePeriod',e.target.value)} onFocus={focus} onBlur={blur} placeholder="e.g. 30 days" /></div>
+            <div><label style={label}>Notice Period</label><SearchableCombobox value={form.noticePeriod} onChange={v=>set('noticePeriod',v)} options={NOTICE_OPTIONS} placeholder="e.g. 30 days" /></div>
             <div>
               <label style={label}>Work Mode</label>
               <select style={inp} value={form.workMode} onChange={e=>set('workMode',e.target.value)}>
@@ -262,8 +412,8 @@ export default function SeekerProfile() {
           </>
         )}
         fields={[
-          { name:'jobTitle', label:'Job Title' },
-          { name:'company', label:'Company' },
+          { name:'jobTitle', label:'Job Title', required:true },
+          { name:'company', label:'Company', required:true },
           { name:'employmentType', label:'Employment Type' },
           { name:'location', label:'Location' },
           { name:'startDate', label:'Start Date', type:'date' },
@@ -288,9 +438,9 @@ export default function SeekerProfile() {
           </>
         )}
         fields={[
-          { name:'degree', label:'Degree' },
+          { name:'degree', label:'Degree', required:true },
           { name:'major', label:'Major' },
-          { name:'institution', label:'Institution', full:true },
+          { name:'institution', label:'Institution', full:true, required:true },
           { name:'country', label:'Country' },
           { name:'graduationYear', label:'Graduation Year' },
           { name:'gpa', label:'GPA (optional)' },
@@ -311,7 +461,7 @@ export default function SeekerProfile() {
           </>
         )}
         fields={[
-          { name:'certificateName', label:'Certificate Name', full:true },
+          { name:'certificateName', label:'Certificate Name', full:true, required:true },
           { name:'issuingOrganization', label:'Issuing Organization' },
           { name:'issueDate', label:'Issue Date', type:'date' },
           { name:'expiryDate', label:'Expiry Date', type:'date' },
@@ -334,7 +484,7 @@ export default function SeekerProfile() {
           </>
         )}
         fields={[
-          { name:'title', label:'Project Title', full:true },
+          { name:'title', label:'Project Title', full:true, required:true },
           { name:'technologies', label:'Technologies Used' },
           { name:'projectUrl', label:'Project URL' },
           { name:'startDate', label:'Start Date', type:'date' },
@@ -352,8 +502,8 @@ export default function SeekerProfile() {
         <div style={cardBody}>
           {languages.length === 0 && <p style={{ color:'#999', fontSize:'13px' }}>None added yet.</p>}
           {languages.map((row, i) => (
-            <div key={i} style={{ display:'grid', gridTemplateColumns:'1.4fr 1fr 1fr 1fr 1fr auto', gap:'8px', alignItems:'end', marginBottom:'10px' }}>
-              <input style={inp} placeholder="Language" value={row.language} onChange={e => updateLanguage(i, 'language', e.target.value)} />
+            <div key={i} style={{ display:'grid', gridTemplateColumns:'1.4fr 1fr 1fr 1fr 1fr auto', gap:'8px', alignItems:'start', marginBottom:'10px' }}>
+              <SearchableCombobox value={row.language} onChange={v => updateLanguage(i, 'language', v)} options={LANGUAGE_OPTIONS} placeholder="Language" />
               {['reading','writing','speaking'].map(k => (
                 <select key={k} style={inp} value={row[k]} onChange={e => updateLanguage(i, k, e.target.value)}>
                   {['Basic','Intermediate','Fluent','Native'].map(o => <option key={o} value={o}>{o}</option>)}
@@ -365,7 +515,15 @@ export default function SeekerProfile() {
               <button type="button" onClick={() => removeLanguage(i)} style={btnDanger}>Remove</button>
             </div>
           ))}
-          {languages.length > 0 && <button onClick={handleSave} style={{ ...btnGhost, marginTop:'4px' }}>Save Languages</button>}
+          {languages.length > 0 && (
+            <div style={{ marginTop:'8px' }}>
+              <button type="button" onClick={saveLanguages} disabled={langSaving} style={{ ...btnGhost, opacity:langSaving?0.6:1 }}>
+                {langSaving ? 'Saving…' : 'Save Languages'}
+              </button>
+              {langError && <p style={{ color:'#c62828', fontSize:'12.5px', marginTop:'6px' }}>{langError}</p>}
+              {langSaved && <p style={{ color:'#057642', fontSize:'12.5px', marginTop:'6px' }}>✅ Languages saved!</p>}
+            </div>
+          )}
         </div>
       </div>
 
@@ -383,7 +541,7 @@ export default function SeekerProfile() {
           </>
         )}
         fields={[
-          { name:'name', label:'Name' },
+          { name:'name', label:'Name', required:true },
           { name:'relationship', label:'Relationship' },
           { name:'position', label:'Position' },
           { name:'company', label:'Company' },
