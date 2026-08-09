@@ -11,6 +11,6 @@
     "install:all": "cd server && npm install && cd ../client && npm install"
   },
   "dependencies": {
-    "adm-zip": "^0.5.17"
+    "adm-zip": "^0.6.0"
   }
 }
