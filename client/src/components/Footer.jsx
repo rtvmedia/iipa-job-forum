@@ -86,6 +86,24 @@ export default function Footer() {
           </div>
         </div>
       </div>
+
+      <div style={{ maxWidth:'1320px', margin:'0 auto', padding:'0 16px 28px' }}>
+        <style>{`
+          .iipa-site-link { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:6px 16px; text-align:center;
+            padding:20px 16px; border-radius:14px; text-decoration:none;
+            background:linear-gradient(135deg, rgba(255,153,51,0.22), rgba(255,255,255,0.08) 50%, rgba(19,136,8,0.22));
+            border:1.5px solid rgba(255,153,51,0.6); transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+          .iipa-site-link:hover { transform:translateY(-3px); border-color:#FF9933; box-shadow:0 10px 26px rgba(0,0,0,0.35); }
+          .iipa-site-link:hover .iipa-site-url { color:#FFC766; }
+          .iipa-site-url { color:#fff; font-weight:800; font-size:clamp(1.25rem, 3.4vw, 2rem); letter-spacing:0.01em; text-decoration:underline; text-underline-offset:5px; text-decoration-color:#FF9933; transition:color .2s; }
+        `}</style>
+        <a className="iipa-site-link" href="https://iipa.co.in/" target="_blank" rel="noopener noreferrer" aria-label="Visit the IIPA website, iipa.co.in">
+          <span style={{ color:'rgba(255,255,255,0.8)', fontSize:'13px', fontWeight:600, letterSpacing:'0.06em', textTransform:'uppercase' }}>Visit the IIPA Website</span>
+          <span className="iipa-site-url">https://iipa.co.in/</span>
+          <span style={{ background:'#FF9933', color:'#1a237e', fontWeight:700, fontSize:'13px', padding:'7px 16px', borderRadius:'16px' }}>Open ↗</span>
+        </a>
+      </div>
+
       <div style={{ borderTop:'1px solid rgba(255,255,255,0.1)', textAlign:'center', padding:'16px', fontSize:'12px', color:'rgba(255,255,255,0.4)' }}>
         © {new Date().getFullYear()} IIPA JOBS. All rights reserved.
       </div>
