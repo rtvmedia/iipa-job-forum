@@ -41,6 +41,9 @@ const User = sequelize.define('User', {
   referralSource:      { type: DataTypes.STRING(60) },     // 'How did you hear about IIPA Jobs?'
   iipaReferredBy:      { type: DataTypes.STRING(150) },
   iipaMemberId:        { type: DataTypes.STRING(60) },
+  emailVerified:       { type: DataTypes.BOOLEAN, defaultValue: false },
+  emailVerifyToken:    { type: DataTypes.STRING(64) },   // SHA-256 of the emailed token
+  emailVerifyExpires:  { type: DataTypes.DATE },
 }, { tableName: 'users', timestamps: true });
 
 module.exports = User;

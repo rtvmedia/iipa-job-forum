@@ -14,6 +14,7 @@ export default function Register() {
   const [form, setForm] = useState({ fullName:'', email:'', password:'', role, phone:'', location:'', linkedinProfile:'', referralSource:'', iipaReferredBy:'', iipaMemberId:'' });
   const [error, setError]     = useState('');
   const [loading, setLoading] = useState(false);
+  const [pending, setPending] = useState(null); // set when the server asks us to verify the email first
 
   const handleSubmit = async e => {
     e.preventDefault(); setError('');
@@ -23,8 +24,9 @@ export default function Register() {
     }
     setLoading(true);
     try {
-      const user = await register(form);
-      navigate(user.role==='recruiter' ? '/recruiter/dashboard' : '/seeker/dashboard');
+      const res = await register(form);
+      if (res.requiresVerification) { setPending(res); return; }
+      navigate(res.role==='recruiter' ? '/recruiter/dashboard' : '/seeker/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed.');
     } finally { setLoading(false); }
@@ -43,6 +45,23 @@ export default function Register() {
           <h1 style={{ fontWeight:700, color:'#1a1a1a', fontSize:'22px', marginTop:'16px' }}>Make the most of your professional life</h1>
         </div>
 
+        {pending ? (
+          <div style={{ background:'#fff', borderRadius:'8px', boxShadow:'0 0 0 1px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.06)', padding:'32px 24px', textAlign:'center' }}>
+            <div style={{ fontSize:'2.4rem', marginBottom:'8px' }}>📧</div>
+            <h2 style={{ fontWeight:700, fontSize:'19px', color:'#1a1a1a', marginBottom:'8px' }}>Verify your email</h2>
+            {pending.emailSent ? (
+              <p style={{ color:'#555', fontSize:'14px', lineHeight:1.6 }}>
+                We have sent a verification link to <strong>{pending.email}</strong>. Open it to activate your account, then sign in. The link is valid for 24 hours.
+              </p>
+            ) : (
+              <p style={{ color:'#555', fontSize:'14px', lineHeight:1.6 }}>
+                Your account was created, but we could not send the verification email to <strong>{pending.email}</strong> just now. Go to the sign-in page and choose “Resend verification email”.
+              </p>
+            )}
+            <p style={{ color:'#888', fontSize:'12.5px', marginTop:'10px' }}>Cannot find it? Check your spam folder.</p>
+            <Link to="/login" style={{ display:'inline-block', marginTop:'18px', background:BLUE, color:'#fff', fontWeight:700, fontSize:'14px', padding:'11px 28px', borderRadius:'24px' }}>Go to Sign in</Link>
+          </div>
+        ) : (
         <div style={{ background:'#fff', borderRadius:'8px', boxShadow:'0 0 0 1px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.06)', padding:'24px' }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', background: role==='recruiter' ? '#fff7ea' : '#f0f7ff', border: `1px solid ${role==='recruiter' ? '#fbe1bf' : '#c8e0f9'}`, padding:'10px', borderRadius:'6px', marginBottom:'18px', fontSize:'13px', fontWeight:600, color: role==='recruiter' ? '#b45309' : BLUE }}>
             {role==='recruiter' ? '🏢 Registering as an Employer' : '🔍 Registering as a Job Seeker'}
@@ -120,10 +139,11 @@ export default function Register() {
           </form>
 
           <div style={{ textAlign:'center', marginTop:'16px', paddingTop:'16px', borderTop:'1px solid #e0e0e0' }}>
-            <span style={{ fontSize:'13px', color:'#666' }}>Already on IIPA Job Forum? </span>
+            <span style={{ fontSize:'13px', color:'#666' }}>Already on IIPA Jobs? </span>
             <Link to="/login" style={{ color:BLUE, fontWeight:600, fontSize:'13px' }}>Sign in</Link>
           </div>
         </div>
+        )}
       </div>
     </div>
   );

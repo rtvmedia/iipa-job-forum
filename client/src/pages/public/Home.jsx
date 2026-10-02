@@ -134,7 +134,7 @@ export default function Home() {
         .h-tags { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:14px; }
         .h-tags button { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:rgba(255,255,255,0.9); font-size:12px; padding:4px 12px; border-radius:12px; cursor:pointer; }
         .strip-badge {
-          display:inline-block; background:linear-gradient(90deg, #FF9933 0%, #ffffff 50%, #138808 100%);
+          display:inline-block; background:#ffffff;
           color:#0a1f44; font-weight:800; font-size:12px; letter-spacing:0.1em; padding:6px 18px;
           border-radius:20px; margin-bottom:14px; box-shadow:0 4px 14px rgba(0,0,0,0.25);
         }

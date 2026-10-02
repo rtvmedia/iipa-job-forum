@@ -17,6 +17,7 @@ console.log('ENV CHECK:', {
   DB_PASS:  process.env.DB_PASS ? '***set***' : 'NOT SET',
 });
 
+app.set('trust proxy', 1);
 app.use(cors({ origin: '*', credentials: false }));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -31,6 +32,7 @@ app.use('/api/admin',        require('./routes/admin'));
 app.use('/api/coordinator',  require('./routes/coordinator'));
 app.use('/api/settings',     require('./routes/settings'));
 app.use('/api/seeker',       require('./routes/seeker'));
+app.use('/api/contact',      require('./routes/contact'));
 
 app.get('/api/health', (_, res) => res.json({
   status: 'ok',

@@ -5,8 +5,10 @@ const BLUE = '#0a66c2';
 const inp = { width:'100%', border:'1px solid #ddd', borderRadius:'6px', padding:'10px 12px', fontSize:'14px', outline:'none', boxSizing:'border-box' };
 
 export default function Contact() {
-  const [form, setForm] = useState({ name:'', email:'', subject:'', message:'' });
+  const [form, setForm] = useState({ name:'', email:'', subject:'', message:'', website:'' });
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   useEffect(() => { api.get('/settings').then(r => setContactEmail(r.data?.contactEmail || '')).catch(() => {}); }, []);
 
@@ -42,7 +44,12 @@ export default function Contact() {
               <p style={{ color:'#666', fontSize:'14px', marginTop:'6px' }}>Thank you — we'll be in touch soon.</p>
             </div>
           ) : (
-            <form onSubmit={e => { e.preventDefault(); setSent(true); }} style={{ display:'flex', flexDirection:'column', gap:'14px' }}>
+            <form onSubmit={async e => {
+              e.preventDefault(); setError(''); setSending(true);
+              try { await api.post('/contact', form); setSent(true); }
+              catch (err) { setError(err.response?.data?.message || 'We could not send your message. Please try again later.'); }
+              finally { setSending(false); }
+            }} style={{ display:'flex', flexDirection:'column', gap:'14px' }}>
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px' }}>
                 <div>
                   <label style={{ display:'block', fontSize:'13px', fontWeight:500, color:'#333', marginBottom:'5px' }}>Name</label>
@@ -65,9 +72,13 @@ export default function Contact() {
                 <textarea required rows={5} value={form.message} onChange={e=>setForm(f=>({...f,message:e.target.value}))}
                   style={{ ...inp, resize:'none' }} onFocus={e=>e.target.style.borderColor=BLUE} onBlur={e=>e.target.style.borderColor='#ddd'} placeholder="Tell us more…" />
               </div>
-              <button type="submit"
-                style={{ background:BLUE, color:'white', fontWeight:600, fontSize:'14px', padding:'11px', borderRadius:'20px', border:'none', cursor:'pointer' }}>
-                Send Message
+              {/* honeypot — hidden from people, bots fill it */}
+              <input tabIndex={-1} autoComplete="off" aria-hidden="true" value={form.website} onChange={e=>setForm(f=>({...f,website:e.target.value}))}
+                style={{ position:'absolute', left:'-9999px', width:'1px', height:'1px', opacity:0 }} />
+              {error && <p style={{ color:'#c62828', fontSize:'13px' }}>{error}</p>}
+              <button type="submit" disabled={sending}
+                style={{ background:BLUE, color:'white', fontWeight:600, fontSize:'14px', padding:'11px', borderRadius:'20px', border:'none', cursor: sending ? 'not-allowed' : 'pointer', opacity: sending ? 0.65 : 1 }}>
+                {sending ? 'Sending…' : 'Send Message'}
               </button>
             </form>
           )}

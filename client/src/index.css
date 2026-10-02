@@ -26,4 +26,3 @@ input, select, textarea {
 }
 
 /* Tricolor bar utility */
-.tricolor { height: 3px; background: linear-gradient(to right, #FF9933 33.33%, #fff 33.33%, #fff 66.66%, #138808 66.66%); }

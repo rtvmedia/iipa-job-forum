@@ -19,7 +19,6 @@ export default function Footer() {
 
   return (
     <footer style={{ background:'#1a237e', color:'rgba(255,255,255,0.75)', marginTop:'auto' }}>
-      <div className="tricolor" />
       <div style={{ maxWidth:'1320px', margin:'0 auto', padding:'40px 16px 24px', display:'grid', gap:'32px', gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))' }}>
         <div>
           <div style={{ display:'flex', alignItems:'center', gap:'12px', marginBottom:'8px' }}>
@@ -44,6 +43,14 @@ export default function Footer() {
               </span>
             </span>
           </div>
+          <style>{`
+            .iipa-site-pill { display:inline-flex; align-items:center; gap:8px; margin-top:6px; padding:9px 18px; border-radius:24px; background:#FF9933; color:#1a237e; font-weight:800; font-size:17px; letter-spacing:0.01em; text-decoration:none; box-shadow:0 4px 12px rgba(0,0,0,0.3); transition:background .2s, transform .2s; }
+            .iipa-site-pill:hover { background:#FFB366; transform:translateY(-2px); }
+            .iipa-site-pill:focus-visible { outline:3px solid #fff; outline-offset:2px; }
+          `}</style>
+          <a className="iipa-site-pill" href="https://iipa.co.in/" target="_blank" rel="noopener noreferrer" aria-label="Visit the IIPA website, iipa.co.in">
+            iipa.co.in <span aria-hidden="true">↗</span>
+          </a>
           {settings.linkedinUrl && (
             <a href={settings.linkedinUrl} target="_blank" rel="noopener noreferrer"
               style={{ display:'inline-flex', alignItems:'center', gap:'6px', color:'rgba(255,255,255,0.7)', fontSize:'13px', marginTop:'8px' }}
@@ -85,27 +92,12 @@ export default function Footer() {
           <div style={{ display:'flex', flexDirection:'column', gap:'8px', fontSize:'13px' }}>
             <Link to="/about"   style={{ color:'rgba(255,255,255,0.65)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>About Us</Link>
             <Link to="/contact" style={{ color:'rgba(255,255,255,0.65)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>Contact</Link>
+            <Link to="/privacy" style={{ color:'rgba(255,255,255,0.65)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>Privacy Policy</Link>
+            <Link to="/terms" style={{ color:'rgba(255,255,255,0.65)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>Terms & Conditions</Link>
             {hasEvents && <Link to="/#events" style={{ color:'rgba(255,255,255,0.65)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>Events</Link>}
             {settings.contactEmail && <a href={`mailto:${settings.contactEmail}`} style={{ color:'rgba(255,255,255,0.65)', wordBreak:'break-all' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>{settings.contactEmail}</a>}
           </div>
         </div>
-      </div>
-
-      <div style={{ maxWidth:'1320px', margin:'0 auto', padding:'0 16px 28px' }}>
-        <style>{`
-          .iipa-site-link { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:6px 16px; text-align:center;
-            padding:20px 16px; border-radius:14px; text-decoration:none;
-            background:linear-gradient(135deg, rgba(255,153,51,0.22), rgba(255,255,255,0.08) 50%, rgba(19,136,8,0.22));
-            border:1.5px solid rgba(255,153,51,0.6); transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
-          .iipa-site-link:hover { transform:translateY(-3px); border-color:#FF9933; box-shadow:0 10px 26px rgba(0,0,0,0.35); }
-          .iipa-site-link:hover .iipa-site-url { color:#FFC766; }
-          .iipa-site-url { color:#fff; font-weight:800; font-size:clamp(1.25rem, 3.4vw, 2rem); letter-spacing:0.01em; text-decoration:underline; text-underline-offset:5px; text-decoration-color:#FF9933; transition:color .2s; }
-        `}</style>
-        <a className="iipa-site-link" href="https://iipa.co.in/" target="_blank" rel="noopener noreferrer" aria-label="Visit the IIPA website, iipa.co.in">
-          <span style={{ color:'rgba(255,255,255,0.8)', fontSize:'13px', fontWeight:600, letterSpacing:'0.06em', textTransform:'uppercase' }}>Visit the IIPA Website</span>
-          <span className="iipa-site-url">https://iipa.co.in/</span>
-          <span style={{ background:'#FF9933', color:'#1a237e', fontWeight:700, fontSize:'13px', padding:'7px 16px', borderRadius:'16px' }}>Open ↗</span>
-        </a>
       </div>
 
       <div style={{ borderTop:'1px solid rgba(255,255,255,0.1)', textAlign:'center', padding:'16px', fontSize:'12px', color:'rgba(255,255,255,0.4)' }}>

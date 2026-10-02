@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import api from '../../api/axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -11,15 +12,24 @@ export default function Login() {
   const [form, setForm]       = useState({ email:'', password:'' });
   const [error, setError]     = useState('');
   const [loading, setLoading] = useState(false);
+  const [unverified, setUnverified] = useState(false);
+  const [resendMsg, setResendMsg] = useState('');
 
   const handleSubmit = async e => {
-    e.preventDefault(); setLoading(true); setError('');
+    e.preventDefault(); setLoading(true); setError(''); setUnverified(false); setResendMsg('');
     try {
       const user = await login(form.email, form.password);
       navigate(user.role==='recruiter' ? '/recruiter/dashboard' : '/seeker/dashboard');
     } catch (err) {
+      setUnverified(err.response?.data?.code === 'EMAIL_NOT_VERIFIED');
       setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally { setLoading(false); }
+  };
+
+  const resend = async () => {
+    setResendMsg('');
+    try { const { data } = await api.post('/auth/resend-verification', { email: form.email }); setResendMsg(data.message); }
+    catch (err) { setResendMsg(err.response?.data?.message || 'Could not send the email right now. Please try again shortly.'); }
   };
 
   return (
@@ -49,6 +59,12 @@ export default function Login() {
                 placeholder="••••••••" />
             </div>
             {error && <p style={{ color:'#c62828', fontSize:'13px' }}>{error}</p>}
+            {unverified && (
+              <div style={{ background:'#f0f7ff', border:'1px solid #c8e0f9', borderRadius:'6px', padding:'10px 12px', fontSize:'13px', color:'#004182' }}>
+                <button type="button" onClick={resend} style={{ background:'none', border:'none', color:BLUE, fontWeight:700, cursor:'pointer', padding:0, textDecoration:'underline' }}>Resend verification email</button>
+                {resendMsg && <p style={{ marginTop:'6px', color:'#333' }}>{resendMsg}</p>}
+              </div>
+            )}
             <button type="submit" disabled={loading}
               style={{ background:BLUE, color:'#fff', fontWeight:700, fontSize:'15px', padding:'12px', borderRadius:'24px', border:'none', opacity:loading?0.65:1, cursor:loading?'not-allowed':'pointer', marginTop:'4px' }}>
               {loading ? 'Signing in…' : 'Sign in'}
@@ -56,7 +72,7 @@ export default function Login() {
           </form>
 
           <div style={{ textAlign:'center', marginTop:'18px', paddingTop:'18px', borderTop:'1px solid #e0e0e0' }}>
-            <span style={{ fontSize:'13px', color:'#666' }}>New to IIPA Job Forum? </span>
+            <span style={{ fontSize:'13px', color:'#666' }}>New to IIPA Jobs? </span>
             <Link to="/register" style={{ color:BLUE, fontWeight:600, fontSize:'13px' }}>Join now</Link>
           </div>
         </div>

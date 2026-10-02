@@ -17,6 +17,7 @@ export function AuthProvider({ children }) {
 
   const register = async (payload) => {
     const { data } = await api.post('/auth/register', payload);
+    if (data.requiresVerification) return data; // not signed in until the email is verified
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
     setUser(data.user);

@@ -4,7 +4,7 @@ const { User, Job, Application, Album, AlbumImage, Event, SiteSetting } = requir
 // ---------- Users ----------
 const getUsers = async (req, res) => {
   try {
-    const users = await User.findAll({ attributes: { exclude: ['password', 'avatarUrl'] }, order: [['createdAt', 'DESC']] });
+    const users = await User.findAll({ attributes: { exclude: ['password', 'emailVerifyToken', 'emailVerifyExpires', 'avatarUrl'] }, order: [['createdAt', 'DESC']] });
     res.json(users);
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
@@ -15,7 +15,7 @@ const updateUser = async (req, res) => {
     const user = await User.findByPk(req.params.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
     await user.update({ fullName, email, role, isActive, approvalStatus, nationality });
-    const clean = await User.findByPk(user.id, { attributes: { exclude: ['password'] } });
+    const clean = await User.findByPk(user.id, { attributes: { exclude: ['password', 'emailVerifyToken', 'emailVerifyExpires'] } });
     res.json(clean);
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
@@ -38,7 +38,7 @@ const assignRole = async (req, res) => {
     const user = await User.findByPk(req.params.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
     await user.update({ role, approvalStatus: 'approved', isActive: true });
-    const clean = await User.findByPk(user.id, { attributes: { exclude: ['password'] } });
+    const clean = await User.findByPk(user.id, { attributes: { exclude: ['password', 'emailVerifyToken', 'emailVerifyExpires'] } });
     res.json(clean);
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
@@ -46,7 +46,7 @@ const assignRole = async (req, res) => {
 // ---------- Approvals (pending users + coordinator-submitted jobs) ----------
 const getApprovals = async (req, res) => {
   try {
-    const pendingUsers = await User.findAll({ where: { approvalStatus: 'pending' }, attributes: { exclude: ['password'] } });
+    const pendingUsers = await User.findAll({ where: { approvalStatus: 'pending' }, attributes: { exclude: ['password', 'emailVerifyToken', 'emailVerifyExpires'] } });
     const pendingJobs  = await Job.findAll({
       where: { approvalStatus: 'pending' },
       include: [{ model: User, as: 'coordinator', attributes: ['fullName', 'email'] }],
@@ -119,7 +119,7 @@ const deleteJobApproval = async (req, res) => {
 // ---------- Coordinators ----------
 const getCoordinators = async (req, res) => {
   try {
-    const coordinators = await User.findAll({ where: { role: 'coordinator' }, attributes: { exclude: ['password'] } });
+    const coordinators = await User.findAll({ where: { role: 'coordinator' }, attributes: { exclude: ['password', 'emailVerifyToken', 'emailVerifyExpires'] } });
     const results = await Promise.all(coordinators.map(async (c) => {
       const submissions = await Job.count({ where: { coordinatorId: c.id } });
       const approved    = await Job.count({ where: { coordinatorId: c.id, approvalStatus: 'approved' } });

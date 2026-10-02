@@ -15,6 +15,9 @@ import Register     from './pages/public/Register';
 import About        from './pages/public/About';
 import Contact      from './pages/public/Contact';
 import Employers    from './pages/public/Employers';
+import Privacy      from './pages/public/Privacy';
+import Terms        from './pages/public/Terms';
+import VerifyEmail  from './pages/public/VerifyEmail';
 
 import SeekerDashboard from './pages/seeker/Dashboard';
 import SeekerProfile   from './pages/seeker/Profile';
@@ -49,6 +52,9 @@ function AppRoutes() {
           <Route path="/about"   element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/employers" element={<Employers />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
 
           <Route path="/seeker/dashboard" element={
             <ProtectedRoute role="seeker"><SeekerDashboard /></ProtectedRoute>

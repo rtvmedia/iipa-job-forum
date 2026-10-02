@@ -44,7 +44,6 @@ export default function Navbar() {
 
   return (
     <nav style={{ background:'#1a237e', position:'sticky', top:0, zIndex:50, boxShadow:'0 1px 3px rgba(0,0,0,0.2)' }}>
-      <div className="tricolor" />
       <div style={{ maxWidth:'1320px', margin:'0 auto', padding:'0 16px', display:'flex', alignItems:'center', justifyContent:'space-between', height:'86px' }}>
 
         {/* Logo */}
@@ -126,7 +125,7 @@ export default function Navbar() {
             <>
               <Link to="/login" style={{ color:'rgba(255,255,255,0.85)', fontSize:'14px' }}>Sign In</Link>
               <Link to="/register?role=recruiter"
-                style={{ background:'linear-gradient(135deg, #138808, #0d6b06)', color:'#fff', fontWeight:700, fontSize:'13px', padding:'6px 16px', borderRadius:'16px', boxShadow:'0 2px 8px rgba(19,136,8,0.4)' }}>
+                style={{ background:'linear-gradient(135deg, #0d9488, #0f766e)', color:'#fff', fontWeight:700, fontSize:'13px', padding:'6px 16px', borderRadius:'16px', boxShadow:'0 2px 8px rgba(13,148,136,0.4)' }}>
                 Register as Employer
               </Link>
             </>
@@ -138,7 +137,7 @@ export default function Navbar() {
                 Get Started
               </Link>
               <Link to="/employers"
-                style={{ background:'linear-gradient(135deg, #138808, #0d6b06)', color:'#fff', fontWeight:700, fontSize:'13px', padding:'6px 16px', borderRadius:'16px', boxShadow:'0 2px 8px rgba(19,136,8,0.4)' }}>
+                style={{ background:'linear-gradient(135deg, #0d9488, #0f766e)', color:'#fff', fontWeight:700, fontSize:'13px', padding:'6px 16px', borderRadius:'16px', boxShadow:'0 2px 8px rgba(13,148,136,0.4)' }}>
                 Are you an Employer?
               </Link>
             </>
@@ -200,7 +199,7 @@ export default function Navbar() {
                   Sign In
                 </Link>
                 <Link to="/register?role=recruiter" onClick={() => setOpen(false)}
-                  style={{ background:'#138808', color:'#fff', fontWeight:700, fontSize:'14px', padding:'12px', borderRadius:'8px', textAlign:'center' }}>
+                  style={{ background:'#0d9488', color:'#fff', fontWeight:700, fontSize:'14px', padding:'12px', borderRadius:'8px', textAlign:'center' }}>
                   Register as Employer
                 </Link>
               </>
@@ -215,7 +214,7 @@ export default function Navbar() {
                   Get Started
                 </Link>
                 <Link to="/employers" onClick={() => setOpen(false)}
-                  style={{ background:'#138808', color:'#fff', fontWeight:700, fontSize:'14px', padding:'12px', borderRadius:'8px', textAlign:'center' }}>
+                  style={{ background:'#0d9488', color:'#fff', fontWeight:700, fontSize:'14px', padding:'12px', borderRadius:'8px', textAlign:'center' }}>
                   Are you an Employer?
                 </Link>
               </>
