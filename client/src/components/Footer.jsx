@@ -6,9 +6,11 @@ import { useAuth } from '../context/AuthContext';
 export default function Footer() {
   const { user } = useAuth();
   const [settings, setSettings] = useState({});
+  const [hasEvents, setHasEvents] = useState(false);
 
   useEffect(() => {
     api.get('/settings').then(r => setSettings(r.data || {})).catch(() => {});
+    api.get('/events').then(r => setHasEvents((r.data || []).length > 0)).catch(() => {});
   }, []);
 
   const logoUrl = settings.footerLogoUrl;
@@ -83,6 +85,8 @@ export default function Footer() {
           <div style={{ display:'flex', flexDirection:'column', gap:'8px', fontSize:'13px' }}>
             <Link to="/about"   style={{ color:'rgba(255,255,255,0.65)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>About Us</Link>
             <Link to="/contact" style={{ color:'rgba(255,255,255,0.65)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>Contact</Link>
+            {hasEvents && <Link to="/#events" style={{ color:'rgba(255,255,255,0.65)' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>Events</Link>}
+            {settings.contactEmail && <a href={`mailto:${settings.contactEmail}`} style={{ color:'rgba(255,255,255,0.65)', wordBreak:'break-all' }} onMouseEnter={e=>e.target.style.color='#FF9933'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.65)'}>{settings.contactEmail}</a>}
           </div>
         </div>
       </div>

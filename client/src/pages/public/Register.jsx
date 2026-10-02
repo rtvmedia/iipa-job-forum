@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { isValidLinkedIn, LINKEDIN_ERROR, REFERRAL_SOURCES, SOURCES_WITH_REFERRER } from '../../utils/referral';
 
 const BLUE = '#0a66c2';
 const inp = { width:'100%', border:'1px solid #ddd', borderRadius:'6px', padding:'10px 12px', fontSize:'14px', outline:'none', boxSizing:'border-box' };
@@ -10,12 +11,17 @@ export default function Register() {
   const navigate      = useNavigate();
   const [searchParams] = useSearchParams();
   const role = searchParams.get('role') === 'recruiter' ? 'recruiter' : 'seeker';
-  const [form, setForm] = useState({ fullName:'', email:'', password:'', role, phone:'', location:'' });
+  const [form, setForm] = useState({ fullName:'', email:'', password:'', role, phone:'', location:'', linkedinProfile:'', referralSource:'', iipaReferredBy:'', iipaMemberId:'' });
   const [error, setError]     = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async e => {
-    e.preventDefault(); setLoading(true); setError('');
+    e.preventDefault(); setError('');
+    if (role === 'seeker') {
+      if (!isValidLinkedIn(form.linkedinProfile)) return setError(LINKEDIN_ERROR);
+      if (!form.referralSource) return setError('Please tell us how you heard about IIPA Jobs.');
+    }
+    setLoading(true);
     try {
       const user = await register(form);
       navigate(user.role==='recruiter' ? '/recruiter/dashboard' : '/seeker/dashboard');
@@ -32,7 +38,7 @@ export default function Register() {
         <div style={{ textAlign:'center', marginBottom:'24px' }}>
           <Link to="/" style={{ display:'inline-flex', alignItems:'center', gap:'6px' }}>
             <span style={{ color:'#FF9933', fontWeight:700, fontSize:'22px' }}>IIPA</span>
-            <span style={{ color:'#1a237e', fontWeight:600, fontSize:'18px' }}>Job Forum</span>
+            <span style={{ color:'#1a237e', fontWeight:600, fontSize:'18px' }}>Jobs</span>
           </Link>
           <h1 style={{ fontWeight:700, color:'#1a1a1a', fontSize:'22px', marginTop:'16px' }}>Make the most of your professional life</h1>
         </div>
@@ -72,6 +78,40 @@ export default function Register() {
                   style={inp} onFocus={e=>e.target.style.borderColor=BLUE} onBlur={e=>e.target.style.borderColor='#ddd'} placeholder="Mumbai, Delhi…" />
               </div>
             </div>
+            {role === 'seeker' && (
+              <>
+                <div>
+                  <label style={{ display:'block', fontSize:'13px', fontWeight:500, color:'#333', marginBottom:'5px' }}>LinkedIn Profile URL *</label>
+                  <input type="text" inputMode="url" value={form.linkedinProfile} onChange={e=>set('linkedinProfile',e.target.value)}
+                    style={inp} onFocus={e=>e.target.style.borderColor=BLUE} onBlur={e=>e.target.style.borderColor='#ddd'} placeholder="https://www.linkedin.com/in/username" />
+                </div>
+                <div>
+                  <label style={{ display:'block', fontSize:'13px', fontWeight:500, color:'#333', marginBottom:'5px' }}>How did you hear about IIPA Jobs? *</label>
+                  <select value={form.referralSource} onChange={e=>setForm(f=>({ ...f, referralSource:e.target.value, iipaReferredBy: SOURCES_WITH_REFERRER.includes(e.target.value) ? f.iipaReferredBy : '', iipaMemberId: e.target.value === 'IIPA Member' ? f.iipaMemberId : '' }))}
+                    style={{ ...inp, background:'#fff' }}>
+                    <option value="">Select an option</option>
+                    {REFERRAL_SOURCES.map(o => <option key={o} value={o}>{o}</option>)}
+                  </select>
+                </div>
+                <style>{'@media(max-width:480px){ .ref-grid{ grid-template-columns:1fr !important; } }'}</style>
+                {SOURCES_WITH_REFERRER.includes(form.referralSource) && (
+                  <div style={{ display:'grid', gridTemplateColumns: form.referralSource === 'IIPA Member' ? '1fr 1fr' : '1fr', gap:'10px' }} className="ref-grid">
+                    <div>
+                      <label style={{ display:'block', fontSize:'13px', fontWeight:500, color:'#333', marginBottom:'5px' }}>Referred By</label>
+                      <input type="text" maxLength={150} value={form.iipaReferredBy} onChange={e=>set('iipaReferredBy',e.target.value)}
+                        style={inp} onFocus={e=>e.target.style.borderColor=BLUE} onBlur={e=>e.target.style.borderColor='#ddd'} placeholder="Name of the person who referred you" />
+                    </div>
+                    {form.referralSource === 'IIPA Member' && (
+                      <div>
+                        <label style={{ display:'block', fontSize:'13px', fontWeight:500, color:'#333', marginBottom:'5px' }}>IIPA Member ID <span style={{ color:'#999', fontWeight:400 }}>(optional)</span></label>
+                        <input type="text" maxLength={60} value={form.iipaMemberId} onChange={e=>set('iipaMemberId',e.target.value)}
+                          style={inp} onFocus={e=>e.target.style.borderColor=BLUE} onBlur={e=>e.target.style.borderColor='#ddd'} />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
             {error && <p style={{ color:'#c62828', fontSize:'13px' }}>{error}</p>}
             <button type="submit" disabled={loading}
               style={{ background:BLUE, color:'#fff', fontWeight:700, fontSize:'15px', padding:'12px', borderRadius:'24px', border:'none', opacity:loading?0.65:1, cursor:loading?'not-allowed':'pointer', marginTop:'4px' }}>

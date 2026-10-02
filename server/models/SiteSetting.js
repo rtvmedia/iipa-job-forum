@@ -6,6 +6,7 @@ const SiteSetting = sequelize.define('SiteSetting', {
   headerLogoUrl:  { type: DataTypes.TEXT('long') },
   footerLogoUrl:  { type: DataTypes.TEXT('long') },
   linkedinUrl:        { type: DataTypes.STRING(300) },
+  contactEmail:       { type: DataTypes.STRING(150) },
   seekerBarcodeUrl:   { type: DataTypes.TEXT('long') },
   seekerWhatsappUrl:  { type: DataTypes.STRING(300) },
   employerBarcodeUrl: { type: DataTypes.TEXT('long') },

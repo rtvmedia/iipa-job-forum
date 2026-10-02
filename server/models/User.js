@@ -38,6 +38,9 @@ const User = sequelize.define('User', {
   noticePeriod:        { type: DataTypes.STRING(60) },
   workMode:            { type: DataTypes.STRING(30) },     // remote / hybrid / onsite
   profileViews:        { type: DataTypes.INTEGER, defaultValue: 0 },
+  referralSource:      { type: DataTypes.STRING(60) },     // 'How did you hear about IIPA Jobs?'
+  iipaReferredBy:      { type: DataTypes.STRING(150) },
+  iipaMemberId:        { type: DataTypes.STRING(60) },
 }, { tableName: 'users', timestamps: true });
 
 module.exports = User;

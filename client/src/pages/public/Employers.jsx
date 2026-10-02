@@ -33,10 +33,10 @@ export default function Employers() {
         <div style={{ maxWidth:'1320px', margin:'0 auto' }}>
           <span style={{ display:'inline-block', background:GOLD, color:'#fff', fontWeight:700, fontSize:'11px', letterSpacing:'0.08em', padding:'5px 16px', borderRadius:'16px', marginBottom:'14px' }}>FOR EMPLOYERS</span>
           <h1 style={{ fontSize:'clamp(1.5rem,3.2vw,2.1rem)', fontWeight:700, color:'white', marginBottom:'10px' }}>
-            Hire Top Talent Across India and the GCC
+            Hire Skilled Indian Professionals
           </h1>
           <p style={{ color:'rgba(255,255,255,0.75)', maxWidth:'560px', margin:'0 auto 22px', fontSize:'14px', lineHeight:1.6 }}>
-            Post vacancies, reach thousands of verified job seekers, and manage your entire hiring pipeline from one dashboard.
+            Post vacancies, reach Indian professionals looking for opportunities in India and abroad, and manage your hiring pipeline from one dashboard.
           </p>
           <div style={{ display:'flex', justifyContent:'center', gap:'12px', flexWrap:'wrap' }}>
             <Link to="/login" style={{ color:'#fff', fontSize:'14px', fontWeight:600, padding:'10px 26px', border:'1px solid rgba(255,255,255,0.5)', borderRadius:'20px' }}>Sign In</Link>
@@ -57,7 +57,7 @@ export default function Employers() {
             <h2 style={{ fontWeight:700, fontSize:'18px', color:'#1a1a1a', marginBottom:'18px' }}>Why hire with IIPA JOBS</h2>
             <div className="emp-grid">
               {[
-                { icon:'🎯', title:'Targeted Reach', desc:'Connect with thousands of pre-screened professionals across India and the GCC.' },
+                { icon:'🎯', title:'Targeted Reach', desc:'Reach Indian professionals looking for career opportunities in India and abroad.' },
                 { icon:'⚡', title:'Fast Hiring', desc:'Post a role in minutes and start reviewing applicants the same day.' },
                 { icon:'📊', title:'Hiring Dashboard', desc:'Track applicants, manage your pipeline, and measure performance in one place.' },
               ].map(f => (
@@ -75,7 +75,7 @@ export default function Employers() {
           <>
             <h2 style={{ fontWeight:700, fontSize:'18px', color:'#1a1a1a', marginBottom:'10px' }}>Post a Job in Minutes</h2>
             <p style={{ color:'#666', fontSize:'14px', lineHeight:1.6, marginBottom:'18px', maxWidth:'640px' }}>
-              Sign in or register as an employer to publish your vacancy. Add role details, requirements, and salary range, and your job goes live for thousands of job seekers to discover.
+              Sign in or register as an employer to publish your vacancy. Add role details, requirements, and salary range, and your job goes live for job seekers to discover.
             </p>
             <div style={{ display:'flex', gap:'12px', flexWrap:'wrap' }}>
               <Link to="/register?role=recruiter" style={{ background:BLUE, color:'#fff', fontWeight:700, fontSize:'14px', padding:'11px 28px', borderRadius:'20px' }}>Register & Post a Job</Link>

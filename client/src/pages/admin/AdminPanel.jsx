@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axios';
 import { exportToExcel } from '../../utils/exportCsv';
+import AdminEvents from './AdminEvents';
 
 const INDIGO = '#4338ca';
 const GOLD   = '#d97706';
@@ -15,6 +16,7 @@ const TABS = [
   { key:'approvals',    label:'Approvals',    icon:'✅' },
   { key:'coordinators', label:'Coordinators', icon:'🧭' },
   { key:'reports',      label:'Reports',      icon:'📈' },
+  { key:'events',       label:'Events',       icon:'📅' },
   { key:'albums',       label:'Albums',       icon:'🖼️' },
   { key:'branding',     label:'Logo & Branding', icon:'🎨' },
 ];
@@ -87,13 +89,14 @@ export default function AdminPanel() {
   const [loading, setLoading]           = useState(false);
 
   const [editUser, setEditUser]           = useState(null);
+  const [viewUser, setViewUser]           = useState(null);
   const [jobModal, setJobModal]           = useState(null); // {} for create, job obj for edit
   const [editApprovalUser, setEditApprovalUser] = useState(null);
   const [editApprovalJob, setEditApprovalJob]   = useState(null);
   const [assignOpen, setAssignOpen]       = useState(false);
   const [albumModal, setAlbumModal]       = useState(null); // {} for create, album obj for edit
   const [manageAlbum, setManageAlbum]     = useState(null);
-  const [brandingText, setBrandingText]   = useState({ linkedinUrl:'', seekerWhatsappUrl:'', employerWhatsappUrl:'' });
+  const [brandingText, setBrandingText]   = useState({ linkedinUrl:'', contactEmail:'', seekerWhatsappUrl:'', employerWhatsappUrl:'' });
 
   const loadAll = useCallback(async () => {
     setLoading(true);
@@ -105,13 +108,14 @@ export default function AdminPanel() {
         api.get('/admin/coordinators'),
         api.get('/admin/reports'),
         api.get('/admin/albums'),
-        api.get('/events'),
+        api.get('/admin/events'),
         api.get('/settings'),
       ]);
       setUsers(u.data); setJobs(j.data); setApprovals(a.data); setCoordinators(c.data);
       setReports(r.data); setAlbums(al.data); setEvents(ev.data); setSettings(s.data);
       setBrandingText({
         linkedinUrl: s.data.linkedinUrl || '',
+        contactEmail: s.data.contactEmail || '',
         seekerWhatsappUrl: s.data.seekerWhatsappUrl || '',
         employerWhatsappUrl: s.data.employerWhatsappUrl || '',
       });
@@ -335,7 +339,7 @@ export default function AdminPanel() {
             <>
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'14px' }}>
                 <h2 style={{ fontWeight:700, fontSize:'17px', color:'#1a1a1a' }}>User Management</h2>
-                <ExportButton onClick={() => exportToExcel('users', users.map(u => ({ Name:u.fullName, Email:u.email, Role:u.role, Nationality:u.nationality, Status:u.approvalStatus, Active:u.isActive })))} />
+                <ExportButton onClick={() => exportToExcel('users', users.map(u => ({ Name:u.fullName, Email:u.email, Phone:u.phone || '', Role:u.role, Nationality:u.nationality, Status:u.approvalStatus, Active:u.isActive, 'LinkedIn URL':u.linkedinProfile || '', 'Referral Source':u.referralSource || '', 'IIPA Referred By':u.iipaReferredBy || '', 'IIPA Member ID':u.iipaMemberId || '' })))} />
               </div>
               <div className="admin-card" style={{ overflow:'hidden' }}>
                 {users.map((u, i) => (
@@ -348,6 +352,7 @@ export default function AdminPanel() {
                       <StatusPill status={u.approvalStatus} />
                       {u.role !== 'coordinator' && <button onClick={() => assignRole(u.id,'coordinator')} style={{ background:INDIGO, color:'#fff', fontSize:'12px', fontWeight:600, padding:'5px 12px', borderRadius:'12px', border:'none', cursor:'pointer' }}>Make Coordinator</button>}
                       {u.role !== 'admin' && u.id !== user.id && <button onClick={() => assignRole(u.id,'admin')} style={{ background:'#fff', color:'#444', fontSize:'12px', fontWeight:600, padding:'5px 12px', borderRadius:'12px', border:'1px solid #ccc', cursor:'pointer' }}>Make Admin</button>}
+                      <button onClick={() => setViewUser(u)} style={{ background:'#fff', color:INDIGO, fontSize:'12px', fontWeight:600, padding:'5px 12px', borderRadius:'12px', border:`1px solid ${INDIGO}`, cursor:'pointer' }}>View</button>
                       <button onClick={() => setEditUser({ ...u })} style={{ background:'#fff', color:GOLD, fontSize:'12px', fontWeight:600, padding:'5px 12px', borderRadius:'12px', border:`1px solid ${GOLD}`, cursor:'pointer' }}>Edit</button>
                       {u.id !== user.id && <button onClick={() => removeUser(u.id)} style={{ background:'#fff', color:RED, fontSize:'12px', fontWeight:600, padding:'5px 12px', borderRadius:'12px', border:`1px solid ${RED}`, cursor:'pointer' }}>Delete</button>}
                     </div>
@@ -536,6 +541,8 @@ export default function AdminPanel() {
             </>
           )}
 
+          {tab === 'events' && <AdminEvents onChanged={loadAll} />}
+
           {tab === 'albums' && (
             <>
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'14px' }}>
@@ -638,6 +645,16 @@ export default function AdminPanel() {
                 </div>
 
                 <div className="admin-card" style={{ padding:'20px', gridColumn:'span 6' }}>
+                  <p style={{ fontWeight:600, color:'#1a1a1a', fontSize:'14px', marginBottom:'10px' }}>Public Contact Email</p>
+                  <div style={{ display:'flex', gap:'8px', flexWrap:'wrap' }}>
+                    <input style={{ ...inp, flex:'1 1 260px', marginBottom:0 }} type="email" placeholder="support@yourdomain.com"
+                      value={brandingText.contactEmail} onChange={e => setBrandingText(b => ({ ...b, contactEmail:e.target.value }))} />
+                    <button onClick={() => saveBrandingText('contactEmail')} style={btnPrimary}>Save</button>
+                  </div>
+                  <p style={{ color:'#888', fontSize:'12px', marginTop:'8px' }}>The only public contact detail shown (Contact page and footer). Leave blank to hide it.</p>
+                </div>
+
+                <div className="admin-card" style={{ padding:'20px', gridColumn:'span 6' }}>
                   <p style={{ fontWeight:600, color:'#1a1a1a', fontSize:'14px', marginBottom:'10px' }}>LinkedIn Page URL</p>
                   <div style={{ display:'flex', gap:'8px', flexWrap:'wrap' }}>
                     <input style={{ ...inp, flex:'1 1 260px', marginBottom:0 }} placeholder="https://linkedin.com/company/iipa-jobs"
@@ -686,6 +703,26 @@ export default function AdminPanel() {
           )}
         </main>
       </div>
+
+      {viewUser && (
+        <Modal title="Candidate Information" onClose={() => setViewUser(null)}>
+          {[
+            ['Name', viewUser.fullName], ['Email', viewUser.email], ['Phone', viewUser.phone], ['Role', viewUser.role],
+            ['Location', viewUser.location], ['Nationality', viewUser.nationality],
+          ].map(([k, v]) => (
+            <p key={k} style={{ fontSize:'13px', marginBottom:'6px' }}><span style={{ color:'#888', display:'inline-block', minWidth:'150px' }}>{k}</span><span style={{ textTransform: k === 'Role' ? 'capitalize' : 'none' }}>{v || '—'}</span></p>
+          ))}
+          {viewUser.role === 'seeker' && (
+            <div style={{ borderTop:'1px solid #eee', marginTop:'10px', paddingTop:'10px' }}>
+              <p style={{ fontSize:'13px', marginBottom:'6px' }}><span style={{ color:'#888', display:'inline-block', minWidth:'150px' }}>LinkedIn Profile</span>
+                {viewUser.linkedinProfile ? <a href={viewUser.linkedinProfile} target="_blank" rel="noopener noreferrer" style={{ color:INDIGO, wordBreak:'break-all' }}>{viewUser.linkedinProfile}</a> : '—'}</p>
+              <p style={{ fontSize:'13px', marginBottom:'6px' }}><span style={{ color:'#888', display:'inline-block', minWidth:'150px' }}>How They Heard</span>{viewUser.referralSource || '—'}</p>
+              <p style={{ fontSize:'13px', marginBottom:'6px' }}><span style={{ color:'#888', display:'inline-block', minWidth:'150px' }}>IIPA Referred By</span>{viewUser.iipaReferredBy || '—'}</p>
+              <p style={{ fontSize:'13px', marginBottom:'6px' }}><span style={{ color:'#888', display:'inline-block', minWidth:'150px' }}>IIPA Member ID</span>{viewUser.iipaMemberId || '—'}</p>
+            </div>
+          )}
+        </Modal>
+      )}
 
       {editUser && (
         <Modal title="Edit User" onClose={() => setEditUser(null)}>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import api from '../../api/axios';
+import EventsCarousel from '../../components/EventsCarousel';
 import {
   CpuChipIcon, BanknotesIcon, UserGroupIcon, MegaphoneIcon,
   WrenchScrewdriverIcon, HeartIcon, AcademicCapIcon, ChartBarIcon,
@@ -94,12 +95,15 @@ export default function Home() {
   const [news, setNews]         = useState([]);
   const [events, setEvents]     = useState([]);
   const navigate = useNavigate();
+  const { hash } = useLocation();
 
   useEffect(() => {
     api.get('/jobs').then(r => { setAllJobs(r.data); setJobs(r.data.slice(0,6)); }).catch(()=>{});
     api.get('/news').then(r => setNews(r.data.slice(0,3))).catch(()=>{});
-    api.get('/events').then(r => setEvents(r.data.slice(0,4))).catch(()=>{});
+    api.get('/events').then(r => setEvents(r.data)).catch(()=>{});
   }, []);
+
+  useEffect(() => { if (hash === '#events') document.getElementById('events')?.scrollIntoView({ behavior:'smooth' }); }, [hash, events.length]);
 
   const handleSearch = e => {
     e.preventDefault();
@@ -115,13 +119,6 @@ export default function Home() {
     ...c,
     count: allJobs.filter(j => (j.category || '').toLowerCase() === c.name.toLowerCase()).length,
   }));
-
-  const STATS = [
-    { value: activeJobs ? `${activeJobs}+` : '0', label:'Active Jobs' },
-    { value: companies  ? `${companies}+`  : '0', label:'Companies' },
-    { value:'18,000+', label:'Professionals' },
-    { value:'94%',     label:'Placement Rate' },
-  ];
 
   return (
     <div>
@@ -141,8 +138,6 @@ export default function Home() {
           color:#0a1f44; font-weight:800; font-size:12px; letter-spacing:0.1em; padding:6px 18px;
           border-radius:20px; margin-bottom:14px; box-shadow:0 4px 14px rgba(0,0,0,0.25);
         }
-        .stats-bar { display:grid; grid-template-columns:repeat(2,1fr); max-width:760px; margin:36px auto 0; background:rgba(255,255,255,0.1); border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.15); }
-        @media(min-width:600px){ .stats-bar{ grid-template-columns:repeat(4,1fr); } }
         .hero-layout { display:grid; grid-template-columns:1fr; gap:20px; align-items:stretch; }
         @media(min-width:920px){ .hero-layout{ grid-template-columns:260px 1fr 260px; } }
         .hero-side-card {
@@ -164,9 +159,6 @@ export default function Home() {
         @media(min-width:1024px){ .jobs-grid{ grid-template-columns:repeat(3,1fr); } }
         .news-grid { display:grid; grid-template-columns:1fr; gap:14px; }
         @media(min-width:768px){ .news-grid{ grid-template-columns:repeat(3,1fr); } }
-        .events-grid { display:grid; grid-template-columns:1fr; gap:12px; }
-        @media(min-width:480px){ .events-grid{ grid-template-columns:repeat(2,1fr); } }
-        @media(min-width:1024px){ .events-grid{ grid-template-columns:repeat(4,1fr); } }
 
         .cat-card {
           background:linear-gradient(160deg, #ffffff 0%, #f3f8ff 100%);
@@ -199,14 +191,6 @@ export default function Home() {
           transition:transform 0.18s ease, box-shadow 0.18s ease;
         }
         .news-card:hover { transform:translateY(-4px); box-shadow:0 12px 26px rgba(10,102,194,0.2); }
-
-        .event-card {
-          background:linear-gradient(160deg, #ffffff 0%, #f6f9ff 100%);
-          border-radius:12px; border:1px solid #dbe8fb; padding:16px;
-          box-shadow:0 4px 14px rgba(10,102,194,0.08);
-          transition:transform 0.18s ease, box-shadow 0.18s ease;
-        }
-        .event-card:hover { transform:translateY(-4px); box-shadow:0 12px 26px rgba(10,102,194,0.2); }
       `}</style>
 
       {/* HERO */}
@@ -218,15 +202,15 @@ export default function Home() {
             <div className="hero-side-card seeker" onClick={() => navigate('/jobs')} role="button" tabIndex={0}>
               <div className="hero-icon-badge"><MagnifyingGlassIcon style={{ width:'26px', height:'26px', color:'#fff' }} /></div>
               <h2 style={{ fontWeight:700, fontSize:'18px', color:'#fff', marginBottom:'8px' }}>I'm a Job Seeker</h2>
-              <p style={{ color:'rgba(255,255,255,0.85)', fontSize:'13px', lineHeight:1.6, marginBottom:'16px' }}>Build your profile, discover thousands of opportunities, and track every application — all in one place.</p>
-              <span className="hero-stat-chip">👥 {activeJobs ? `${activeJobs}+` : ''} roles open now</span>
+              <p style={{ color:'rgba(255,255,255,0.85)', fontSize:'13px', lineHeight:1.6, marginBottom:'16px' }}>Build your profile, discover career opportunities in India and abroad, and track every application — all in one place.</p>
+              <span className="hero-stat-chip">{activeJobs > 0 ? `👥 ${activeJobs} open ${activeJobs === 1 ? 'role' : 'roles'} right now` : '👥 Browse current openings'}</span>
             </div>
 
             {/* Center content */}
             <div style={{ textAlign:'center' }}>
               <span className="strip-badge">STAFFING AND CAREER SOLUTIONS</span>
               <h1 style={{ fontSize:'clamp(1.4rem, 3vw, 2rem)', fontWeight:700, color:'white', lineHeight:1.3, marginBottom:'22px' }}>
-                Connecting Professionals to the Right Opportunities
+                Connecting Indian Professionals with Career Opportunities in India and Abroad
               </h1>
               <form onSubmit={handleSearch} className="h-form">
                 <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Job title, company, or keyword..." />
@@ -245,18 +229,10 @@ export default function Home() {
               <div className="hero-icon-badge"><BuildingOffice2Icon style={{ width:'26px', height:'26px', color:'#fff' }} /></div>
               <h2 style={{ fontWeight:700, fontSize:'18px', color:'#fff', marginBottom:'8px' }}>I'm an Employer</h2>
               <p style={{ color:'rgba(255,255,255,0.9)', fontSize:'13px', lineHeight:1.6, marginBottom:'16px' }}>Post vacancies, review matched candidates, and manage your full hiring pipeline with ease.</p>
-              <span className="hero-stat-chip">🏢 {companies ? `${companies}+` : ''} companies hiring</span>
+              <span className="hero-stat-chip">{companies > 0 ? `🏢 ${companies} ${companies === 1 ? 'company is' : 'companies are'} hiring` : '🏢 Post your first vacancy'}</span>
             </div>
           </div>
 
-          <div className="stats-bar">
-            {STATS.map(s => (
-              <div key={s.label} style={{ padding:'16px 12px', textAlign:'center' }}>
-                <div style={{ color:'#fff', fontWeight:700, fontSize:'1.3rem' }}>{s.value}</div>
-                <div style={{ color:'rgba(255,255,255,0.55)', fontSize:'12px', marginTop:'2px' }}>{s.label}</div>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -339,25 +315,11 @@ export default function Home() {
         </>
       )}
 
-      {/* EVENTS */}
+      {/* EVENTS — only active events; section is hidden when there are none */}
       {events.length > 0 && (
         <>
           <hr className="section-divider" />
-          <section style={{ maxWidth:W, margin:'0 auto', padding:'28px 16px' }}>
-            <h2 style={{ fontWeight:700, fontSize:'17px', color:'#1a1a1a', marginBottom:'14px' }}>Upcoming Events</h2>
-            <div className="events-grid">
-              {events.map(ev => (
-                <div key={ev.id} className="event-card" style={{ borderLeft:`3px solid ${BLUE}` }}>
-                  <div style={{ fontSize:'1.2rem', marginBottom:'6px' }}>{ev.isOnline ? '🌐' : '📍'}</div>
-                  <h3 style={{ fontWeight:600, color:'#1a1a1a', fontSize:'14px', lineHeight:1.4 }}>{ev.title}</h3>
-                  <p style={{ color:'#666', fontSize:'12px', marginTop:'4px' }}>{new Date(ev.eventDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</p>
-                  <span style={{ marginTop:'8px', display:'inline-block', fontSize:'11px', padding:'2px 10px', borderRadius:'10px', background:ev.isOnline?'#e8f5e9':'#e8f1fb', color:ev.isOnline?'#057642':BLUE, fontWeight:500 }}>
-                    {ev.isOnline ? 'Online' : 'In Person'}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </section>
+          <EventsCarousel events={events} />
         </>
       )}
     </div>

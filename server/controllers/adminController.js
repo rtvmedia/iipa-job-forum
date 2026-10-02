@@ -4,7 +4,7 @@ const { User, Job, Application, Album, AlbumImage, Event, SiteSetting } = requir
 // ---------- Users ----------
 const getUsers = async (req, res) => {
   try {
-    const users = await User.findAll({ attributes: { exclude: ['password'] }, order: [['createdAt', 'DESC']] });
+    const users = await User.findAll({ attributes: { exclude: ['password', 'avatarUrl'] }, order: [['createdAt', 'DESC']] });
     res.json(users);
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
@@ -249,6 +249,7 @@ const updateSettings = async (req, res) => {
     if (req.files?.seekerBarcode?.[0])     updates.seekerBarcodeUrl     = toDataUri(req.files.seekerBarcode[0]);
     if (req.files?.employerBarcode?.[0])   updates.employerBarcodeUrl   = toDataUri(req.files.employerBarcode[0]);
     if (req.body.linkedinUrl !== undefined)         updates.linkedinUrl         = req.body.linkedinUrl;
+    if (req.body.contactEmail !== undefined)        updates.contactEmail        = String(req.body.contactEmail).trim() || null;
     if (req.body.seekerWhatsappUrl !== undefined)   updates.seekerWhatsappUrl   = req.body.seekerWhatsappUrl;
     if (req.body.employerWhatsappUrl !== undefined) updates.employerWhatsappUrl = req.body.employerWhatsappUrl;
     await settings.update(updates);

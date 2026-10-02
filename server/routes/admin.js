@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { authenticate, requireRole } = require('../middleware/auth');
 const upload = require('../middleware/upload');
 const ctrl = require('../controllers/adminController');
+const events = require('../controllers/eventController');
 
 router.use(authenticate, requireRole('admin'));
 
@@ -39,6 +40,13 @@ router.delete('/settings/seeker-barcode',   ctrl.deleteSeekerBarcode);
 router.delete('/settings/employer-barcode', ctrl.deleteEmployerBarcode);
 router.delete('/settings/header-logo',      ctrl.deleteHeaderLogo);
 router.delete('/settings/footer-logo',      ctrl.deleteFooterLogo);
+
+const eventFiles = upload.uploadEvent.fields([{ name: 'image', maxCount: 1 }, { name: 'banner', maxCount: 1 }]);
+router.get('/events',          events.adminList);
+router.put('/events/reorder',  events.adminReorder);
+router.post('/events',         eventFiles, events.adminCreate);
+router.put('/events/:id',      eventFiles, events.adminUpdate);
+router.delete('/events/:id',   events.adminDelete);
 
 router.get('/jobs',           ctrl.getAllJobsAdmin);
 router.post('/jobs',          ctrl.createJobAdmin);

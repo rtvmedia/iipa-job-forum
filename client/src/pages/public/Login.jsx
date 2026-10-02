@@ -28,7 +28,7 @@ export default function Login() {
         <div style={{ textAlign:'center', marginBottom:'24px' }}>
           <Link to="/" style={{ display:'inline-flex', alignItems:'center', gap:'6px' }}>
             <span style={{ color:'#FF9933', fontWeight:700, fontSize:'22px' }}>IIPA</span>
-            <span style={{ color:'#1a237e', fontWeight:600, fontSize:'18px' }}>Job Forum</span>
+            <span style={{ color:'#1a237e', fontWeight:600, fontSize:'18px' }}>Jobs</span>
           </Link>
           <h1 style={{ fontWeight:700, color:'#1a1a1a', fontSize:'22px', marginTop:'16px' }}>Sign in</h1>
           <p style={{ color:'#666', fontSize:'14px', marginTop:'4px' }}>Stay updated on your professional world</p>

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
+import { isValidLinkedIn, LINKEDIN_ERROR, REFERRAL_SOURCES, SOURCES_WITH_REFERRER } from '../../utils/referral';
 
 const BLUE = '#0a66c2';
 const inp = { width:'100%', border:'1px solid #ddd', borderRadius:'6px', padding:'9px 12px', fontSize:'13.5px', outline:'none', boxSizing:'border-box' };
@@ -212,6 +213,7 @@ export default function SeekerProfile() {
     currentJobTitle:'', yearsOfExperience:'', willingToRelocate:false, visaStatus:'', nationality:'',
     skills:'', websiteUrl:'', linkedinProfile:'', githubProfile:'', portfolioUrl:'',
     desiredJobTitle:'', preferredLocations:'', salaryExpectation:'', noticePeriod:'', workMode:'',
+    referralSource:'', iipaReferredBy:'', iipaMemberId:'',
   });
   const [languages, setLanguages] = useState([]);
   const [saving, setSaving] = useState(false);
@@ -235,6 +237,7 @@ export default function SeekerProfile() {
         visaStatus:d.visaStatus||'', nationality:d.nationality||'',
         skills:d.skills||'', websiteUrl:d.websiteUrl||'', linkedinProfile:d.linkedinProfile||'', githubProfile:d.githubProfile||'', portfolioUrl:d.portfolioUrl||'',
         desiredJobTitle:d.desiredJobTitle||'', preferredLocations:d.preferredLocations||'', salaryExpectation:d.salaryExpectation||'', noticePeriod:d.noticePeriod||'', workMode:d.workMode||'',
+        referralSource:d.referralSource||'', iipaReferredBy:d.iipaReferredBy||'', iipaMemberId:d.iipaMemberId||'',
       });
       setResumeUrl(d.resumeUrl || '');
       try { setLanguages(d.languages ? JSON.parse(d.languages) : []); } catch { setLanguages([]); }
@@ -252,7 +255,10 @@ export default function SeekerProfile() {
 
   const handleSave = async e => {
     e.preventDefault();
-    setSaving(true); setError(''); setSaved(false);
+    setSaved(false);
+    if (!isValidLinkedIn(form.linkedinProfile)) { setError(LINKEDIN_ERROR); return; }
+    if (!form.referralSource) { setError('Please tell us how you heard about IIPA Jobs.'); return; }
+    setSaving(true); setError('');
     try {
       await api.put('/auth/profile', { ...form, languages: JSON.stringify(languages) });
       setSaved(true);
@@ -327,6 +333,8 @@ export default function SeekerProfile() {
         </div>
       </div>
 
+      {error && <p style={{ color:'#c62828', fontSize:'13px', marginBottom:'12px', background:'#fdecea', border:'1px solid #f5c2c0', borderRadius:'6px', padding:'8px 12px' }}>{error}</p>}
+
       {/* Personal Information */}
       <form onSubmit={handleSave}>
         <div style={card}>
@@ -385,9 +393,32 @@ export default function SeekerProfile() {
           <div style={cardHead}><h2 style={{ fontWeight:700, fontSize:'15px', color:'#1a1a1a' }}>Portfolio & Links</h2></div>
           <div style={{ ...cardBody, display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px' }}>
             <div><label style={label}>Website</label><input style={inp} value={form.websiteUrl} onChange={e=>set('websiteUrl',e.target.value)} onFocus={focus} onBlur={blur} /></div>
-            <div><label style={label}>LinkedIn</label><input style={inp} value={form.linkedinProfile} onChange={e=>set('linkedinProfile',e.target.value)} onFocus={focus} onBlur={blur} /></div>
+            <div><label style={label}>LinkedIn Profile URL *</label><input style={inp} placeholder="https://www.linkedin.com/in/username" value={form.linkedinProfile} onChange={e=>set('linkedinProfile',e.target.value)} onFocus={focus} onBlur={blur} /></div>
             <div><label style={label}>GitHub</label><input style={inp} value={form.githubProfile} onChange={e=>set('githubProfile',e.target.value)} onFocus={focus} onBlur={blur} /></div>
             <div><label style={label}>Portfolio URL</label><input style={inp} value={form.portfolioUrl} onChange={e=>set('portfolioUrl',e.target.value)} onFocus={focus} onBlur={blur} /></div>
+          </div>
+        </div>
+
+        {/* How you found IIPA Jobs */}
+        <div style={card}>
+          <div style={cardHead}><h2 style={{ fontWeight:700, fontSize:'15px', color:'#1a1a1a' }}>How You Found IIPA Jobs</h2></div>
+          <div style={{ ...cardBody, display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px' }}>
+            <div style={{ gridColumn: SOURCES_WITH_REFERRER.includes(form.referralSource) ? undefined : '1/-1' }}>
+              <label style={label}>How did you hear about IIPA Jobs? *</label>
+              <select style={{ ...inp, background:'#fff' }} value={form.referralSource}
+                onChange={e => setForm(f => ({ ...f, referralSource:e.target.value,
+                  iipaReferredBy: SOURCES_WITH_REFERRER.includes(e.target.value) ? f.iipaReferredBy : '',
+                  iipaMemberId: e.target.value === 'IIPA Member' ? f.iipaMemberId : '' }))}>
+                <option value="">Select an option</option>
+                {REFERRAL_SOURCES.map(o => <option key={o} value={o}>{o}</option>)}
+              </select>
+            </div>
+            {SOURCES_WITH_REFERRER.includes(form.referralSource) && (
+              <div><label style={label}>IIPA Referred By</label><input style={inp} maxLength={150} value={form.iipaReferredBy} onChange={e=>set('iipaReferredBy',e.target.value)} onFocus={focus} onBlur={blur} placeholder="Name of the person who referred you" /></div>
+            )}
+            {form.referralSource === 'IIPA Member' && (
+              <div><label style={label}>IIPA Member ID <span style={{ color:'#999', fontWeight:400 }}>(optional)</span></label><input style={inp} maxLength={60} value={form.iipaMemberId} onChange={e=>set('iipaMemberId',e.target.value)} onFocus={focus} onBlur={blur} /></div>
+            )}
           </div>
         </div>
 

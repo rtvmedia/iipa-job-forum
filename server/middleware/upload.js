@@ -44,9 +44,20 @@ const uploadMemory = multer({
   },
 });
 
+// Event images/banners: JPG, JPEG, PNG, WebP only. The admin UI resizes before upload; this is the server-side cap.
+const uploadEvent = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 3 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (/^image\/(jpeg|png|webp)$/.test(file.mimetype)) cb(null, true);
+    else cb(new Error('Event images must be JPG, JPEG, PNG or WebP'));
+  },
+});
+
 const toDataUri = (file) => `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
 
 module.exports = upload;
 module.exports.uploadResume = uploadResume;
 module.exports.uploadMemory = uploadMemory;
+module.exports.uploadEvent = uploadEvent;
 module.exports.toDataUri = toDataUri;
