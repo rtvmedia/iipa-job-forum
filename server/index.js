@@ -3,6 +3,7 @@ const express = require('express');
 const cors    = require('cors');
 const path    = require('path');
 const { sequelize } = require('./models');
+const ensureSchema = require('./utils/ensureSchema');
 
 const app        = express();
 const isProd     = process.env.NODE_ENV === 'production';
@@ -20,6 +21,13 @@ console.log('ENV CHECK:', {
 app.set('trust proxy', 1);
 app.use(cors({ origin: '*', credentials: false }));
 app.use(express.json());
+
+let markSchemaReady;
+const schemaReady = Promise.race([
+  new Promise((resolve) => { markSchemaReady = resolve; }),
+  new Promise((resolve) => setTimeout(resolve, 25000)),
+]);
+app.use('/api', (req, res, next) => { schemaReady.then(() => next()); });
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // API routes
@@ -78,7 +86,9 @@ sequelize.authenticate()
     return sequelize.sync();
   })
   .then(() => console.log('Tables synced.'))
+  .then(() => ensureSchema(sequelize))
   .catch(err => {
     console.error('DB connection failed:', err.message);
     // Don't exit — keep server running so we can debug
-  });
+  })
+  .finally(() => markSchemaReady());
